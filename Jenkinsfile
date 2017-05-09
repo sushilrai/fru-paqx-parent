@@ -32,7 +32,7 @@ pipeline {
     stages {
         stage('Compile') {
             steps {
-                sh "mvn -U clean install -DskipTest=true -DskipITs"
+                sh "mvn -U clean install -DskipTests=true -DskipITs"
             }
         }
         stage('Prepare test services') {
