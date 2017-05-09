@@ -36,6 +36,15 @@ public class ScaleIOSDC
     @Column(name = "SDC_MDM_CONNECTION_STATE")
     private String mdmConnectionState;
 
+    public ScaleIOSDC(final String id, final String name, final String sdcIp, final String sdcGuid, final String mdmConnectorState)
+    {
+        this.id=id;
+        this.name=name;
+        this.sdcIp=sdcIp;
+        this.sdcGuid=sdcGuid;
+        this.mdmConnectionState=mdmConnectorState;
+    }
+
     public ScaleIOData getScaleIOData()
     {
         return scaleIOData;

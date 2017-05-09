@@ -7,8 +7,11 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by kenefj on 03/05/17.
@@ -32,9 +35,26 @@ public class ScaleIOSDS
     private String sdsState;
 
     @Column(name = "SDS_PORT")
-    private String port;
+    private int port;
 
-//    public String getUuid()
+    @ManyToOne(cascade = CascadeType.ALL)
+    private ScaleIOFaultSet faultSet;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    private ScaleIOProtectionDomain protectionDomain;
+
+    @OneToMany(cascade= CascadeType.ALL, orphanRemoval = true, mappedBy = "sds")
+    private List<ScaleIORoleIP> roleIPs = new ArrayList<>();
+
+    public ScaleIOSDS(final String id, final String name, final String sdsState, final int port)
+    {
+        this.id=id;
+        this.name=name;
+        this.sdsState=sdsState;
+        this.port=port;
+    }
+
+    //    public String getUuid()
 //    {
 //        return uuid;
 //    }
@@ -74,12 +94,12 @@ public class ScaleIOSDS
         this.sdsState = sdsState;
     }
 
-    public String getPort()
+    public int getPort()
     {
         return port;
     }
 
-    public void setPort(final String port)
+    public void setPort(final int port)
     {
         this.port = port;
     }
@@ -96,4 +116,19 @@ public class ScaleIOSDS
 
     @ManyToOne(cascade = CascadeType.ALL)
     private ScaleIOData scaleIOData;
+
+    public void setFaultSet(final ScaleIOFaultSet faultSet)
+    {
+        this.faultSet = faultSet;
+    }
+
+    public void setProtectionDomain(final ScaleIOProtectionDomain protectionDomain)
+    {
+        this.protectionDomain = protectionDomain;
+    }
+
+    public void addRoleIP(final ScaleIORoleIP roleIP1)
+    {
+        this.roleIPs.add(roleIP1);
+    }
 }
