@@ -5,7 +5,7 @@
     <parent>
         <groupId>com.dell.cpsd.paqx.fru</groupId>
         <artifactId>fru-paqx-parent</artifactId>
-        <version>1.0</version>
+        <version>1.1-SNAPSHOT</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -41,20 +41,20 @@
         <dependency>
             <groupId>com.dell.cpsd.common.messaging</groupId>
             <artifactId>common-rabbitmq</artifactId>
-            <version>1.3</version>
+            <version>1.4-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>com.dell.cpsd.common.client</groupId>
             <artifactId>common-client</artifactId>
-            <version>1.2</version>
+            <version>1.3-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>com.dell.cpsd.hdp.capability.registry</groupId>
             <artifactId>hdp-capability-registry-client</artifactId>
             <type>jar</type>
-            <version>0.2</version>
+            <version>0.3-SNAPSHOT</version>
         </dependency>
 
         <!--<dependency>-->
@@ -66,7 +66,7 @@
         <dependency>
             <artifactId>storage-capabilities-api</artifactId>
             <groupId>com.dell.cpsd.storage.capabilities.api</groupId>
-            <version>0.1</version>
+            <version>0.2-SNAPSHOT</version>
             <type>zip</type>
             <classifier>schemas</classifier>
         </dependency>
@@ -74,7 +74,7 @@
         <dependency>
             <artifactId>virtualization-capabilities-api</artifactId>
             <groupId>com.dell.cpsd.virtualization.capabilities.api</groupId>
-            <version>0.2</version>
+            <version>0.3-SNAPSHOT</version>
             <type>zip</type>
             <classifier>schemas</classifier>
         </dependency>
@@ -179,7 +179,7 @@
         <dependency>
             <groupId>com.dell.cpsd.common.messaging</groupId>
             <artifactId>common-testing</artifactId>
-            <version>1.3</version>
+            <version>1.4-SNAPSHOT</version>
             <scope>test</scope>
         </dependency>
 
@@ -296,7 +296,7 @@
                     <dependency>
                         <groupId>com.dell.cpsd.common.messaging</groupId>
                         <artifactId>common-contract-enricher</artifactId>
-                        <version>1.3</version>
+                        <version>1.4-SNAPSHOT</version>
                     </dependency>
                 </dependencies>
                 <executions>
