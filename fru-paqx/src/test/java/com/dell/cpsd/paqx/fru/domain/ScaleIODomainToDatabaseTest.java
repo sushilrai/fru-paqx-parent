@@ -102,6 +102,51 @@ public class ScaleIODomainToDatabaseTest
         master.setMdmCluster(cluster);
         cluster.addMaster(master);
 
+        //Add an sdc element.
+        for (int i=0; i<4; i++)
+        {
+            ScaleIOSDC sdc = new ScaleIOSDC(newId(), "sdcName"+i, "192.168.1." + i, "guid"+i, "ok");
+            sdc.setScaleIOData(data);
+            data.addSdc(sdc);
+        }
+
+        ScaleIOFaultSet faultSet = new ScaleIOFaultSet(newId(), "faultSetName");
+        ScaleIOProtectionDomain protectionDomain = new ScaleIOProtectionDomain(newId(), "protectionDomainName", "stateActive");
+        faultSet.setProtectionDomain(protectionDomain);
+        protectionDomain.addFaultSet(faultSet);
+
+        protectionDomain.setScaleIOData(data);
+        data.addProtectionDomain(protectionDomain);
+
+
+
+        //Add an sds element.
+        for (int i=0; i<4; i++)
+        {
+            ScaleIOSDS sds = new ScaleIOSDS(newId(), "sdsName"+i, "active"+i , 1230+i);
+            sds.setScaleIOData(data);
+            data.addSds(sds);
+
+            if (i%2 == 0)
+            {
+                sds.setFaultSet(faultSet);
+                faultSet.addSDS(sds);
+            }
+            sds.setProtectionDomain(protectionDomain);
+            protectionDomain.addSDS(sds);
+
+            //Add two ips
+            ScaleIORoleIP roleIP1 = new ScaleIORoleIP("role1", "192.168.2."+i);
+            roleIP1.setSds(sds);
+            sds.addRoleIP(roleIP1);
+
+            ScaleIORoleIP roleIP2 = new ScaleIORoleIP("role1", "192.168.3."+i);
+            roleIP2.setSds(sds);
+            sds.addRoleIP(roleIP2);
+        }
+
+
+
         ScaleIOData data2=testEntityManager.persist(data);
 
         assertTrue(true);
@@ -118,4 +163,3 @@ public class ScaleIODomainToDatabaseTest
         return new String("id"+(idCount++));
     }
 }
-

@@ -1,10 +1,12 @@
 package com.dell.cpsd.paqx.fru.domain;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -12,7 +14,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name="SCALEIO_IP_LIST")
-public class ScaleIOIPList
+public class ScaleIORoleIP
 {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -24,6 +26,15 @@ public class ScaleIOIPList
 
     @Column(name = "SDS_IP")
     private String ip;
+
+    @ManyToOne(cascade= CascadeType.ALL)
+    private ScaleIOSDS sds;
+
+    public ScaleIORoleIP(final String role, final String ip)
+    {
+        this.role=role;
+        this.ip=ip;
+    }
 
     public Long getUuid()
     {
@@ -53,5 +64,10 @@ public class ScaleIOIPList
     public void setIp(final String ip)
     {
         this.ip = ip;
+    }
+
+    public void setSds(final ScaleIOSDS sds)
+    {
+        this.sds = sds;
     }
 }

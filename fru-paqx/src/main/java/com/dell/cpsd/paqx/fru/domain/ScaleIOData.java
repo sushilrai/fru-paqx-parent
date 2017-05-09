@@ -6,10 +6,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,7 +24,7 @@ public class ScaleIOData
     @Column(name = "SCALEIO_UUID", unique = true, nullable = false)
     private Long uuid;
 
-    @Column(name = "SCALEIO_ID", unique=true, nullable=false)
+    @Column(name = "SCALEIO_ID", unique = true, nullable = false)
     private String id;
 
     @Column(name = "SCALEIO_NAME")
@@ -45,36 +45,39 @@ public class ScaleIOData
     @Column(name = "SCALEIO_VERSION")
     private String version;
 
-    @OneToOne(cascade=CascadeType.ALL,optional=false)
-//    @JoinColumn(
-//            name="MDM_CLUSTER_UUID", unique=true, nullable=false, updatable=false)
-    private ScaleIOMdmCluster mdmCluster=null;
+    @OneToOne(cascade = CascadeType.ALL, optional = false)
+    //    @JoinColumn(
+    //            name="MDM_CLUSTER_UUID", unique=true, nullable=false, updatable=false)
+    private ScaleIOMdmCluster mdmCluster = null;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "scaleIOData", orphanRemoval = true)
-    List<ScaleIOSDC> sdcList;
+    List<ScaleIOSDC> sdcList = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "scaleIOData", orphanRemoval = true)
-    List<ScaleIOSDS> sdsList;
+    List<ScaleIOSDS> sdsList = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "scaleIOData", orphanRemoval = true)
-    List<ScaleIOIP> tiebreakerScaleIOList;
+    List<ScaleIOIP> tiebreakerScaleIOList = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "scaleIOData", orphanRemoval = true)
-    List<ScaleIOIP> primaryMDMIPList;
+    List<ScaleIOIP> primaryMDMIPList = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "scaleIOData", orphanRemoval = true)
-    List<ScaleIOIP> secondaryMDMIPList;
+    List<ScaleIOIP> secondaryMDMIPList = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "scaleIOData", orphanRemoval = true)
+    List<ScaleIOProtectionDomain> protectionDomains = new ArrayList<>();
 
     public ScaleIOData(final String id1, final String scaleIODataName, final String scaleIODataInstallID, final String mdmMode,
             final String systemVersionName, final String mdmClusterState, final String version)
     {
-        this.id=id1;
-        this.name=scaleIODataName;
-        this.installId=scaleIODataInstallID;
-        this.mdmMode=mdmMode;
-        this.systemVersionName=systemVersionName;
-        this.mdmClusterState=mdmClusterState;
-        this.version=version;
+        this.id = id1;
+        this.name = scaleIODataName;
+        this.installId = scaleIODataInstallID;
+        this.mdmMode = mdmMode;
+        this.systemVersionName = systemVersionName;
+        this.mdmClusterState = mdmClusterState;
+        this.version = version;
     }
 
     public Long getUuid()
@@ -172,9 +175,9 @@ public class ScaleIOData
         return sdcList;
     }
 
-    public void setSdcList(final List<ScaleIOSDC> sdcList)
+    public void addSdc(final ScaleIOSDC sdc)
     {
-        this.sdcList = sdcList;
+        this.sdcList.add(sdc);
     }
 
     public List<ScaleIOSDS> getSdsList()
@@ -182,9 +185,9 @@ public class ScaleIOData
         return sdsList;
     }
 
-    public void setSdsList(final List<ScaleIOSDS> sdsList)
+    public void addSds(final ScaleIOSDS sds)
     {
-        this.sdsList = sdsList;
+        this.sdsList.add(sds);
     }
 
     public List<ScaleIOIP> getTiebreakerScaleIOList()
@@ -215,5 +218,10 @@ public class ScaleIOData
     public void setSecondaryMDMIPList(final List<ScaleIOIP> secondaryMDMIPList)
     {
         this.secondaryMDMIPList = secondaryMDMIPList;
+    }
+
+    public void addProtectionDomain(final ScaleIOProtectionDomain protectionDomain)
+    {
+        this.protectionDomains.add(protectionDomain);
     }
 }
