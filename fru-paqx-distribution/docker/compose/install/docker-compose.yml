@@ -9,22 +9,4 @@ services:
     image: cpsd-fru-paqx-service
     container_name: symphony-fru-paqx
     network_mode: "host"
-    depends_on:
-     - vcenter-adapter
-     - rackhd-adapter
-     - coprhd-adapter
 
-  vcenter-adapter:
-    image: cpsd-vcenter-adapter-service
-    container_name: symphony-vcenter-adapter-service
-    network_mode: "host"
-
-  rackhd-adapter:
-    image: cpsd-rackhd-adapter-service
-    container_name: symphony-rackhd-adapter-service
-    network_mode: "host"
-
-  coprhd-adapter:
-    image: cpsd-coprhd-adapter-service
-    container_name: symphony-coprhd-adapter-service
-    network_mode: "host"
