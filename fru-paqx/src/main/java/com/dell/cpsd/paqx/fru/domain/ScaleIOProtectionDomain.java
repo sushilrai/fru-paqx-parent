@@ -39,6 +39,9 @@ public class ScaleIOProtectionDomain
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "protectionDomain", orphanRemoval = true)
     private List<ScaleIOSDS> sdsList = new ArrayList<>();
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "protectionDomain", orphanRemoval = true)
+    private List<ScaleIOStoragePool> storagePools = new ArrayList<>();
+
     @ManyToOne(cascade=CascadeType.ALL)
     private ScaleIOData scaleIOData;
 
@@ -102,5 +105,10 @@ public class ScaleIOProtectionDomain
     public void setScaleIOData(final ScaleIOData scaleIOData)
     {
         this.scaleIOData = scaleIOData;
+    }
+
+    public void addStoragePool(final ScaleIOStoragePool storagePool)
+    {
+        storagePools.add(storagePool);
     }
 }

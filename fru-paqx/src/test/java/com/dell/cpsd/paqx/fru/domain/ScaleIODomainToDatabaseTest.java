@@ -102,7 +102,7 @@ public class ScaleIODomainToDatabaseTest
         master.setMdmCluster(cluster);
         cluster.addMaster(master);
 
-        //Add an sdc element.
+        //Add sdc elements.
         for (int i=0; i<4; i++)
         {
             ScaleIOSDC sdc = new ScaleIOSDC(newId(), "sdcName"+i, "192.168.1." + i, "guid"+i, "ok");
@@ -118,9 +118,15 @@ public class ScaleIODomainToDatabaseTest
         protectionDomain.setScaleIOData(data);
         data.addProtectionDomain(protectionDomain);
 
+        ScaleIOStoragePool storagePool = new ScaleIOStoragePool(newId(), "storagePoolName", 10, 20, 30);
+        storagePool.setProtectionDomain(protectionDomain);
+        protectionDomain.addStoragePool(storagePool);
 
+        ScaleIOStoragePool storagePool2 = new ScaleIOStoragePool(newId(), "storagePoolName2", 40, 50, 60);
+        storagePool2.setProtectionDomain(protectionDomain);
+        protectionDomain.addStoragePool(storagePool2);
 
-        //Add an sds element.
+        //Add sds elements.
         for (int i=0; i<4; i++)
         {
             ScaleIOSDS sds = new ScaleIOSDS(newId(), "sdsName"+i, "active"+i , 1230+i);
@@ -143,6 +149,21 @@ public class ScaleIODomainToDatabaseTest
             ScaleIORoleIP roleIP2 = new ScaleIORoleIP("role1", "192.168.3."+i);
             roleIP2.setSds(sds);
             sds.addRoleIP(roleIP2);
+
+            //Add two devices
+            ScaleIODevice device1 = new ScaleIODevice(newId(), "deviceName1"+i, "deviceCurrentPathName1"+i);
+            device1.setStoragePool(storagePool);
+            storagePool.addDevice(device1);
+
+            device1.setSds(sds);
+            sds.addDevice(device1);
+
+            ScaleIODevice device2 = new ScaleIODevice(newId(), "deviceName2"+i, "deviceCurrentPathName2"+i);
+            device2.setStoragePool(storagePool2);
+            storagePool2.addDevice(device2);
+
+            device2.setSds(sds);
+            sds.addDevice(device2);
         }
 
 
@@ -153,9 +174,14 @@ public class ScaleIODomainToDatabaseTest
 
         ScaleIOData data3=testEntityManager.find(ScaleIOData.class,1l);
 
+        compareDataModels(data,data3);
+
         java.lang.System.out.println("Hello");
+    }
 
-
+    private void compareDataModels(final ScaleIOData data, final ScaleIOData data3)
+    {
+        assertTrue(data.equals(data3));
     }
 
     private static String newId()
