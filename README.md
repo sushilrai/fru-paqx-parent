@@ -20,14 +20,13 @@ You can see the complete list of possible API calls by exploring the Swagger UI 
 
 ## Before you begin
 
-Make sure the following is installed:
-```
-Apache Maven 3.0.5+
-Docker 1.12+
-Docker Compose 1.8.0+
-Java Development Kit (version 8)
-RabbitMQ  3.6.6
-```
+Verify that the following tools are installed:
+ 
+* Apache Maven 3.0.5+
+* Docker 1.12+
+* Docker Compose 1.8.0+
+* Java Development Kit (version 8)
+* RabbitMQ 3.6.6
 
 ## Building
 
@@ -49,7 +48,7 @@ To run the Java application manually:
 
 `java -jar ./fru-paqx/target/fru-paqx-1.0-SNAPSHOT.jar`
 
-After running the Java application, you can access the REST API with the following calls:
+After running the Java application, access the REST API with the following calls:
 
 * GET <http://localhost:18443/fru/api/about>
 
@@ -71,18 +70,21 @@ This call returns a JSON response that provides the next step to execute in the 
 
 ```
 {
-    "id": "123abc-456def-789ghi",
-    "workflow": "quanta-replacement-d51b-esxi",
-    "currentStep": "Initiate Workflow",
-    "nodes": null,
-    "links": [{
-        "rel": "step-next",
-        "href": "https://localhost:18443/fru/api/workflow/123abc-456def-789ghi/rackhd-endpoint",
-        "type": "application/vnd.dellemc.rackhd.endpoint+json",
-        "method": "POST"
-    }]
+   "id": "72a6914e-35ea-471f-ae78-04f889c5cfb5",
+   "workflow": "quanta-replacement-d51b-esxi",
+   "currentStep": "workflowInitiated",
+   "currentStepNumber": -1,
+   "expectedNumberOfSteps": -1,
+   "lastResponse": null,
+   "links": [{
+       "rel": "step-next",
+       "href": "https://10.3.249.133:18443/fru/api/workflow/72a6914e-35ea-471f-ae78-04f889c5cfb5/rackhd-endpoint",
+       "type": "application/vnd.dellemc.rackhd.endpoint+json",
+       "method": "POST"
+   }]
 }
 ```
+
 Execute the rackhd-endpoint API call (shown in the href value above) with a POST body that uses the format shown below:
 
 ```
@@ -101,11 +103,13 @@ After submitting the information required to access the four endpoints, you can 
 ## Contributing
 
 Project Symphony is a collection of services and libraries housed at [GitHub][github].
+
 Contribute code and make submissions at the relevant GitHub repository level. See [our documentation][contributing] for details on how to contribute.
 
 ## Community
 
 Reach out to us on the Slack [#symphony][slack] channel. Request an invite at [{code}Community][codecommunity].
+
 You can also join [Google Groups][googlegroups] and start a discussion. 
 
 [slack]: https://codecommunity.slack.com/messages/symphony
