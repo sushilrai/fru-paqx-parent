@@ -43,8 +43,14 @@ public class ScaleIOSDS
     @ManyToOne(cascade = CascadeType.ALL)
     private ScaleIOProtectionDomain protectionDomain;
 
+    @ManyToOne(cascade = CascadeType.ALL)
+    private ScaleIOData scaleIOData;
+
     @OneToMany(cascade= CascadeType.ALL, orphanRemoval = true, mappedBy = "sds")
     private List<ScaleIORoleIP> roleIPs = new ArrayList<>();
+
+    @OneToMany(cascade= CascadeType.ALL, orphanRemoval = true, mappedBy = "sds")
+    private List<ScaleIODevice> devices = new ArrayList<>();
 
     public ScaleIOSDS(final String id, final String name, final String sdsState, final int port)
     {
@@ -114,9 +120,6 @@ public class ScaleIOSDS
         this.scaleIOData = scaleIOData;
     }
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    private ScaleIOData scaleIOData;
-
     public void setFaultSet(final ScaleIOFaultSet faultSet)
     {
         this.faultSet = faultSet;
@@ -130,5 +133,10 @@ public class ScaleIOSDS
     public void addRoleIP(final ScaleIORoleIP roleIP1)
     {
         this.roleIPs.add(roleIP1);
+    }
+
+    public void addDevice(final ScaleIODevice device)
+    {
+        this.devices.add(device);
     }
 }

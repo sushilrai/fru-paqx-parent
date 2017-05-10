@@ -1,10 +1,12 @@
 package com.dell.cpsd.paqx.fru.domain;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
@@ -27,6 +29,19 @@ public class ScaleIODevice
 
     @Column(name = "DEVICE_CURRENT_PATH_NAME", unique = true, nullable = false)
     private String deviceCurrentPathName;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    private ScaleIOStoragePool storagePool;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    private ScaleIOSDS sds;
+
+    public ScaleIODevice(final String id, final String scaleIOName, final String deviceCurrentPathName)
+    {
+        this.id = id;
+        this.name = scaleIOName;
+        this.deviceCurrentPathName = deviceCurrentPathName;
+    }
 
     public Long getUuid()
     {
@@ -66,5 +81,15 @@ public class ScaleIODevice
     public void setDeviceCurrentPathName(final String deviceCurrentPathName)
     {
         this.deviceCurrentPathName = deviceCurrentPathName;
+    }
+
+    public void setStoragePool(final ScaleIOStoragePool storagePool)
+    {
+        this.storagePool = storagePool;
+    }
+
+    public void setSds(final ScaleIOSDS sds)
+    {
+        this.sds = sds;
     }
 }
