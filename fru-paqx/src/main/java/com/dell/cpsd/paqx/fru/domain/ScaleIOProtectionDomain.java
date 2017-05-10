@@ -1,5 +1,8 @@
 package com.dell.cpsd.paqx.fru.domain;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -102,6 +105,11 @@ public class ScaleIOProtectionDomain
         this.sdsList.add(sds);
     }
 
+    public ScaleIOData getScaleIOData()
+    {
+        return scaleIOData;
+    }
+
     public void setScaleIOData(final ScaleIOData scaleIOData)
     {
         this.scaleIOData = scaleIOData;
@@ -113,63 +121,34 @@ public class ScaleIOProtectionDomain
     }
 
     @Override
-    public boolean equals(final Object o)
-    {
-        if (this == o)
-        {
-            return true;
-        }
-        if (!(o instanceof ScaleIOProtectionDomain))
-        {
-            return false;
-        }
-
-        final ScaleIOProtectionDomain that = (ScaleIOProtectionDomain) o;
-
-        if (getUuid() != null ? !getUuid().equals(that.getUuid()) : that.getUuid() != null)
-        {
-            return false;
-        }
-        if (getId() != null ? !getId().equals(that.getId()) : that.getId() != null)
-        {
-            return false;
-        }
-        if (getName() != null ? !getName().equals(that.getName()) : that.getName() != null)
-        {
-            return false;
-        }
-        if (getProtectionDomainState() != null ?
-                !getProtectionDomainState().equals(that.getProtectionDomainState()) :
-                that.getProtectionDomainState() != null)
-        {
-            return false;
-        }
-        if (!faultSets.equals(that.faultSets))
-        {
-            return false;
-        }
-        if (!sdsList.equals(that.sdsList))
-        {
-            return false;
-        }
-        if (!storagePools.equals(that.storagePools))
-        {
-            return false;
-        }
-        return scaleIOData != null ? scaleIOData.equals(that.scaleIOData) : that.scaleIOData == null;
+    public int hashCode() {
+        return new HashCodeBuilder().append(uuid).append(id).append(name).append(protectionDomainState)
+                .append(faultSets).append(sdsList).append(storagePools).toHashCode();
     }
 
+    /**
+     * For the sake of non-circular checks "equals" checks for relationship attributes must be checked
+     * on only one side of the relationship. In the case of OneToMany relationships it will be done on
+     * the "One" side (the one holding the List)
+     *
+     * On the "Many" Side we'll ignore the attribute when doing the equals comparison as a way to avoid
+     * a circular reference starting and endless cycle.
+     *
+     * @param other the object to compare to
+     * @return true if their attributes are equal
+     */
     @Override
-    public int hashCode()
-    {
-        int result = getUuid() != null ? getUuid().hashCode() : 0;
-        result = 31 * result + (getId() != null ? getId().hashCode() : 0);
-        result = 31 * result + (getName() != null ? getName().hashCode() : 0);
-        result = 31 * result + (getProtectionDomainState() != null ? getProtectionDomainState().hashCode() : 0);
-        result = 31 * result + faultSets.hashCode();
-        result = 31 * result + sdsList.hashCode();
-        result = 31 * result + storagePools.hashCode();
-        result = 31 * result + (scaleIOData != null ? scaleIOData.hashCode() : 0);
-        return result;
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        if (!(other instanceof ScaleIOProtectionDomain)) {
+            return false;
+        }
+        //Toot stands for "That Object Over There"
+        ScaleIOProtectionDomain toot = ((ScaleIOProtectionDomain) other);
+        return new EqualsBuilder().append(uuid, toot.uuid).append(id, toot.id).append(name, toot.name)
+                .append(protectionDomainState, toot.protectionDomainState).append(faultSets, toot.faultSets)
+                .append(sdsList, toot.sdsList).append(storagePools, toot.storagePools).isEquals();
     }
 }

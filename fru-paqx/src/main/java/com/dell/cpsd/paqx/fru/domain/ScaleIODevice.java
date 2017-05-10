@@ -1,5 +1,8 @@
 package com.dell.cpsd.paqx.fru.domain;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -91,5 +94,33 @@ public class ScaleIODevice
     public void setSds(final ScaleIOSDS sds)
     {
         this.sds = sds;
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().append(uuid).append(id).append(name).append(deviceCurrentPathName).toHashCode();
+    }
+
+    /**
+     * For the sake of non-circular checks "equals" checks for relationship attributes must be checked
+     * on only one side of the relationship. In the case of OneToMany relationships it will be done on
+     * the "One" side (the one holding the List)
+     *
+     * @param other the object to compare to
+     * @return true if their attributes are equal
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        if (!(other instanceof ScaleIODevice)) {
+            return false;
+        }
+        //Toot stands for "That Object Over There"
+        ScaleIODevice toot = ((ScaleIODevice) other);
+
+        return new EqualsBuilder().append(uuid, toot.uuid).append(id, toot.id).append(name, toot.name)
+                .append(deviceCurrentPathName, toot.deviceCurrentPathName).isEquals();
     }
 }

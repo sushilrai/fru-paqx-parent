@@ -1,5 +1,8 @@
 package com.dell.cpsd.paqx.fru.domain;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -46,8 +49,6 @@ public class ScaleIOData
     private String version;
 
     @OneToOne(cascade = CascadeType.ALL, optional = false)
-    //    @JoinColumn(
-    //            name="MDM_CLUSTER_UUID", unique=true, nullable=false, updatable=false)
     private ScaleIOMdmCluster mdmCluster = null;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "scaleIOData", orphanRemoval = true)
@@ -223,5 +224,48 @@ public class ScaleIOData
     public void addProtectionDomain(final ScaleIOProtectionDomain protectionDomain)
     {
         this.protectionDomains.add(protectionDomain);
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().append(uuid).append(id).append(name).append(installId)
+                .append(mdmMode).append(systemVersionName).append(mdmClusterState).append(version)
+                .append(sdcList).append(sdsList).append(tiebreakerScaleIOList).append(primaryMDMIPList)
+                .append(secondaryMDMIPList).append(protectionDomains).toHashCode();
+    }
+
+    /**
+     * For the sake of non-circular checks "equals" checks for relationship attributes must be checked
+     * on only one side of the relationship. In the case of OneToMany relationships it will be done on
+     * the "One" side (the one holding the List)
+     *
+     * On the "Many" Side we'll ignore the attribute when doing the equals comparison as a way to avoid
+     * a circular reference starting and endless cycle.
+     *
+     * In the case of OneToOne relationships, one of the sides have to be chosen. For the case of Clusters
+     * and Systems the representative side chosen will be the MDM Cluster Side, therefore the equals comparison
+     * shall be made on that side and we will ignore the attribute on this side.
+     *
+     * @param other the object to compare to
+     * @return true if their attributes are equal
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        if (!(other instanceof ScaleIOData)) {
+            return false;
+        }
+
+        //Toot stands for "That Object Over There"
+        ScaleIOData toot = ((ScaleIOData) other);
+
+        return new EqualsBuilder().append(uuid, toot.uuid).append(id, toot.id).append(name, toot.name)
+                .append(installId, toot.installId).append(mdmMode, toot.mdmMode).append(systemVersionName, toot.systemVersionName)
+                .append(mdmClusterState, toot.mdmClusterState).append(version, toot.version)
+                .append(sdcList, toot.sdcList).append(sdsList, toot.sdsList).append(tiebreakerScaleIOList, toot.tiebreakerScaleIOList)
+                .append(primaryMDMIPList, toot.primaryMDMIPList).append(secondaryMDMIPList, toot.secondaryMDMIPList)
+                .append(protectionDomains, toot.protectionDomains).isEquals();
     }
 }

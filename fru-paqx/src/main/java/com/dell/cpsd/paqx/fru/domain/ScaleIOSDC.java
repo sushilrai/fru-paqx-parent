@@ -1,5 +1,8 @@
 package com.dell.cpsd.paqx.fru.domain;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -36,6 +39,9 @@ public class ScaleIOSDC
     @Column(name = "SDC_MDM_CONNECTION_STATE")
     private String mdmConnectionState;
 
+    @ManyToOne(cascade = CascadeType.ALL)
+    private ScaleIOData scaleIOData;
+
     public ScaleIOSDC(final String id, final String name, final String sdcIp, final String sdcGuid, final String mdmConnectorState)
     {
         this.id=id;
@@ -55,6 +61,31 @@ public class ScaleIOSDC
         this.scaleIOData = scaleIOData;
     }
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    private ScaleIOData scaleIOData;
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().append(uuid).append(id).append(name).append(sdcIp).append(sdcGuid)
+                .append(mdmConnectionState).toHashCode();
+    }
+
+    /**
+     * For the sake of non-circular checks "equals" checks for relationship attributes must be checked
+     * on only one side of the relationship. In the case of OneToMany relationships it will be done on
+     * the "One" side (the one holding the List)
+     *
+     * @param other the object to compare to
+     * @return true if their attributes are equal
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        if (!(other instanceof ScaleIOSDC)) {
+            return false;
+        }
+        //Toot stands for "That Object Over There"
+        ScaleIOSDC toot = ((ScaleIOSDC) other);
+        return new EqualsBuilder().append(uuid, toot.uuid).append(id, toot.id).append(name, toot.name).append(sdcIp, toot.sdcIp)
+                .append(sdcGuid, toot.sdcGuid).append(mdmConnectionState, toot.mdmConnectionState).isEquals();
+    }
 }
