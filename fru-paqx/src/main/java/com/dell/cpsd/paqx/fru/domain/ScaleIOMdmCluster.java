@@ -1,5 +1,8 @@
 package com.dell.cpsd.paqx.fru.domain;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -42,8 +45,17 @@ public class ScaleIOMdmCluster
     @Column(name = "MDM_CLUSTER_GOOD_REPLICAS_NUM")
     private Integer goodReplicasNum;
 
-@OneToOne(optional=false, mappedBy="mdmCluster", cascade=CascadeType.ALL)
+    @OneToOne(optional=false, mappedBy="mdmCluster", cascade=CascadeType.ALL)
     private ScaleIOData scaleIOData;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "mdmCluster", orphanRemoval = true)
+    List<ScaleIOSDSElementInfo> slaveElementInfo = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "mdmCluster", orphanRemoval = true)
+    List<ScaleIOSDSElementInfo> tiebreakerElementInfo = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "mdmCluster", orphanRemoval = true)
+    List<ScaleIOSDSElementInfo> masterElementInfo = new ArrayList<>();
 
     public ScaleIOMdmCluster(final String id8, final String clusterName, final String clusterState, final String clusterMode, final int i,
             final int i1)
@@ -121,15 +133,6 @@ public class ScaleIOMdmCluster
         this.goodReplicasNum = goodReplicasNum;
     }
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "mdmCluster", orphanRemoval = true)
-    List<ScaleIOSDSElementInfo> slaveElementInfo = new ArrayList<>();
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "mdmCluster", orphanRemoval = true)
-    List<ScaleIOSDSElementInfo> tiebreakerElementInfo = new ArrayList<>();
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "mdmCluster", orphanRemoval = true)
-    List<ScaleIOSDSElementInfo> masterElementInfo = new ArrayList<>();
-
     public void setScaleIOData(final ScaleIOData scaleIOData)
     {
         this.scaleIOData = scaleIOData;
@@ -153,5 +156,45 @@ public class ScaleIOMdmCluster
     public void addTiebreaker(final ScaleIOTiebreakerElementInfo slave)
     {
         this.tiebreakerElementInfo.add(slave);
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().append(uuid).append(id).append(name).append(clusterState)
+                .append(clusterMode).append(goodNodesNum).append(goodReplicasNum).append(scaleIOData)
+                .append(slaveElementInfo).append(tiebreakerElementInfo).append(masterElementInfo).toHashCode();
+    }
+
+    /**
+     * For the sake of non-circular checks "equals" checks for relationship attributes must be checked
+     * on only one side of the relationship. In the case of OneToMany relationships it will be done on
+     * the "One" side (the one holding the List)
+     *
+     * On the "Many" Side we'll ignore the attribute when doing the equals comparison as a way to avoid
+     * a circular reference starting and endless cycle.
+     *
+     * In the case of OneToOne relationships, one of the sides have to be chosen. For the case of Clusters
+     * and Systems the representative side chosen will be the MDM Cluster Side, therefore the equals comparison
+     * shall be made on this side.
+     *
+     * @param other the object to compare to
+     * @return true if their attributes are equal
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        if (!(other instanceof ScaleIOMdmCluster)) {
+            return false;
+        }
+        //Toot stands for "That Object Over There"
+        ScaleIOMdmCluster toot = ((ScaleIOMdmCluster) other);
+        return new EqualsBuilder().append(uuid, toot.uuid).append(id, toot.id).append(name, toot.name)
+                .append(clusterState, toot.clusterState).append(clusterMode, toot.clusterMode)
+                .append(goodNodesNum, toot.goodNodesNum).append(goodReplicasNum, toot.goodReplicasNum)
+                .append(scaleIOData, toot.scaleIOData).append(slaveElementInfo, toot.slaveElementInfo)
+                .append(tiebreakerElementInfo, toot.tiebreakerElementInfo).append(masterElementInfo, toot.masterElementInfo)
+                .isEquals();
     }
 }

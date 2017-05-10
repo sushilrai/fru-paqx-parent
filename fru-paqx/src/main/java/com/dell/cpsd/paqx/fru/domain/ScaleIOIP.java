@@ -1,5 +1,8 @@
 package com.dell.cpsd.paqx.fru.domain;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
@@ -21,6 +24,23 @@ import javax.persistence.Table;
 @DiscriminatorColumn(name = "SCALEIO_IP_TYPE")
 public abstract class ScaleIOIP
 {
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Column(name = "IP_UUID", unique = true, nullable = false)
+    private Long uuid;
+
+    @Column(name = "IP_ID", unique = true, nullable = false)
+    private String id;
+
+    @Column(name = "IP")
+    private String ip;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    public ScaleIOData scaleIOData;
+
+    @ManyToOne(cascade=CascadeType.ALL)
+    public ScaleIOSDSElementInfo sdsElementInfo;
+
     public ScaleIOIP(final String id, final String ip)
     {
         this.id = id;
@@ -36,17 +56,6 @@ public abstract class ScaleIOIP
     {
         this.uuid = uuid;
     }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Column(name = "IP_UUID", unique = true, nullable = false)
-    private Long uuid;
-
-    @Column(name = "IP_ID", unique = true, nullable = false)
-    private String id;
-
-    @Column(name = "IP")
-    private String ip;
 
     public String getId()
     {
@@ -78,11 +87,31 @@ public abstract class ScaleIOIP
         this.scaleIOData = scaleIOData;
     }
 
-    @ManyToOne(cascade = CascadeType.ALL)
-    public ScaleIOData scaleIOData;
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().append(uuid).append(id).append(ip).toHashCode();
+    }
 
-    @ManyToOne(cascade=CascadeType.ALL)
-    public ScaleIOSDSElementInfo sdsElementInfo;
+    /**
+     * For the sake of non-circular checks "equals" checks for relationship attributes must be checked
+     * on only one side of the relationship. In the case of OneToMany relationships it will be done on
+     * the "One" side (the one holding the List)
+     *
+     * @param other the object to compare to
+     * @return true if their attributes are equal
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        if (!(other instanceof ScaleIOIP)) {
+            return false;
+        }
+        //Toot stands for "That Object Over There"
+        ScaleIOIP toot = ((ScaleIOIP) other);
+        return new EqualsBuilder().append(uuid, toot.uuid).append(id, toot.id).append(ip, toot.ip).isEquals();
+    }
 
     public void setScaleIOSDSElementInfo(final ScaleIOSDSElementInfo sdsElementInfo)
     {

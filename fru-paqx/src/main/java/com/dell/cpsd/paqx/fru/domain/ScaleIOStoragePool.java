@@ -1,5 +1,8 @@
 package com.dell.cpsd.paqx.fru.domain;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -68,5 +71,38 @@ public class ScaleIOStoragePool
     public String getId()
     {
         return id;
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().append(uuid).append(id).append(name).append(capacityAvailableForVolumeAllocationInKb)
+                .append(maxCapacityInKb).append(numOfVolumes).append(devices).toHashCode();
+    }
+
+    /**
+     * For the sake of non-circular checks "equals" checks for relationship attributes must be checked
+     * on only one side of the relationship. In the case of OneToMany relationships it will be done on
+     * the "One" side (the one holding the List)
+     *
+     * On the "Many" Side we'll ignore the attribute when doing the equals comparison as a way to avoid
+     * a circular reference starting and endless cycle.
+     *
+     * @param other the object to compare to
+     * @return true if their attributes are equal
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        if (!(other instanceof ScaleIOStoragePool)) {
+            return false;
+        }
+        //Toot stands for "That Object Over There"
+        ScaleIOStoragePool toot = ((ScaleIOStoragePool) other);
+        return new EqualsBuilder().append(uuid, toot.uuid).append(id, toot.id).append(name, toot.name)
+                .append(capacityAvailableForVolumeAllocationInKb, toot.capacityAvailableForVolumeAllocationInKb)
+                .append(maxCapacityInKb, toot.maxCapacityInKb).append(numOfVolumes, toot.numOfVolumes)
+                .append(devices, toot.devices).isEquals();
     }
 }

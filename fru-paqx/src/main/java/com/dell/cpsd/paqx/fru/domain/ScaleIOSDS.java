@@ -1,5 +1,8 @@
 package com.dell.cpsd.paqx.fru.domain;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -120,9 +123,19 @@ public class ScaleIOSDS
         this.scaleIOData = scaleIOData;
     }
 
+    public ScaleIOFaultSet getFaultSet()
+    {
+        return faultSet;
+    }
+
     public void setFaultSet(final ScaleIOFaultSet faultSet)
     {
         this.faultSet = faultSet;
+    }
+
+    public ScaleIOProtectionDomain getProtectionDomain()
+    {
+        return protectionDomain;
     }
 
     public void setProtectionDomain(final ScaleIOProtectionDomain protectionDomain)
@@ -138,5 +151,37 @@ public class ScaleIOSDS
     public void addDevice(final ScaleIODevice device)
     {
         this.devices.add(device);
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().append(uuid).append(id).append(name).append(sdsState)
+                .append(roleIPs).append(devices).toHashCode();
+    }
+
+    /**
+     * For the sake of non-circular checks "equals" checks for relationship attributes must be checked
+     * on only one side of the relationship. In the case of OneToMany relationships it will be done on
+     * the "One" side (the one holding the List)
+     *
+     * On the "Many" Side we'll ignore the attribute when doing the equals comparison as a way to avoid
+     * a circular reference starting and endless cycle.
+     *
+     * @param other the object to compare to
+     * @return true if their attributes are equal
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (other == this) {
+            return true;
+        }
+        if (!(other instanceof ScaleIOSDS)) {
+            return false;
+        }
+        //Toot stands for "That Object Over There"
+        ScaleIOSDS toot = ((ScaleIOSDS) other);
+        return new EqualsBuilder().append(uuid, toot.uuid).append(id, toot.id).append(name, toot.name)
+                .append(sdsState, toot.sdsState).append(roleIPs, toot.roleIPs)
+                .append(devices, toot.devices).isEquals();
     }
 }
