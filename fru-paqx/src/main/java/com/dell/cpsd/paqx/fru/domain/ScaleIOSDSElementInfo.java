@@ -30,13 +30,13 @@ public abstract class ScaleIOSDSElementInfo
     private Long uuid;
 
 
-    public ScaleIOSDSElementInfo(final String id9, final int i, final String version1, final String slave, final String s)
+    public ScaleIOSDSElementInfo(final String id, final int port, final String versionInfo, final String name, final String role)
     {
-        this.id = id9;
-        this.port = i;
-        this.versionInfo = version1;
-        this.name = slave;
-        this.role = s;
+        this.id = id;
+        this.port = port;
+        this.versionInfo = versionInfo;
+        this.name = name;
+        this.role = role;
     }
 
     public Long getUuid()
@@ -68,16 +68,10 @@ public abstract class ScaleIOSDSElementInfo
     private String role;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sdsElementInfo", orphanRemoval = true)
-    List<ScaleIOIP> managementIPs;
+    List<ScaleIOIP> managementIPs = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "sdsElementInfo", orphanRemoval = true)
     List<ScaleIOIP> ips = new ArrayList<>();
-
-//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "mdmCluster", orphanRemoval = true)
-//    List<ScaleIOElementIP> managementIPs=new ArrayList<>();
-//
-//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "mdmCluster", orphanRemoval = true)
-//    List<ScaleIOElementIP> ips = new ArrayList<>();
 
     public ScaleIOMdmCluster getMdmCluster()
     {
@@ -89,8 +83,18 @@ public abstract class ScaleIOSDSElementInfo
         this.mdmCluster = mdmCluster;
     }
 
-    public void addIP(final ScaleIOIP id16)
+    public void addIP(final ScaleIOIP ip)
     {
-        this.ips.add(id16);
+        this.ips.add(ip);
+    }
+
+    public void addManagementIP(final ScaleIOIP ip)
+    {
+        this.managementIPs.add(ip);
+    }
+
+    public String getId()
+    {
+        return id;
     }
 }

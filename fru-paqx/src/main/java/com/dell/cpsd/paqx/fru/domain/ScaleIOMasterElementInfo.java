@@ -14,8 +14,8 @@ import javax.persistence.ManyToOne;
 @DiscriminatorValue("ELEMENT_MASTER")
 public class ScaleIOMasterElementInfo extends ScaleIOSDSElementInfo
 {
-    public ScaleIOMasterElementInfo(final String id9, final int i, final String version1, final String slave, final String s)
+    public ScaleIOMasterElementInfo(final String id, final int port, final String versionInfo, final String name, final String role)
     {
-        super(id9, i, version1, slave, s);
+        super(id, port, versionInfo, name, role);
     }
 }

@@ -64,4 +64,9 @@ public class ScaleIOStoragePool
     {
         this.devices.add(device);
     }
+
+    public String getId()
+    {
+        return id;
+    }
 }
