@@ -5,8 +5,10 @@
 package com.dell.cpsd.paqx.fru.service;
 
 import com.dell.cpsd.paqx.fru.dto.FRUSystemData;
+import com.dell.cpsd.paqx.fru.rest.repository.DataServiceRepository;
 import com.dell.cpsd.storage.capabilities.api.ScaleIOSystemDataRestRep;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
 import java.util.UUID;
@@ -20,7 +22,9 @@ import static org.junit.Assert.assertNotNull;
  *
  */
 public class DataServiceImplTest {
-    DataService dataServiceUnderTest = new DataServiceImpl();
+
+    @Autowired
+    DataService dataServiceUnderTest;
 
     @Test
     public void getData() {

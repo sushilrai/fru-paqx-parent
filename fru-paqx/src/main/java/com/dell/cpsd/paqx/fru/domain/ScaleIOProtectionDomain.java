@@ -111,4 +111,65 @@ public class ScaleIOProtectionDomain
     {
         storagePools.add(storagePool);
     }
+
+    @Override
+    public boolean equals(final Object o)
+    {
+        if (this == o)
+        {
+            return true;
+        }
+        if (!(o instanceof ScaleIOProtectionDomain))
+        {
+            return false;
+        }
+
+        final ScaleIOProtectionDomain that = (ScaleIOProtectionDomain) o;
+
+        if (getUuid() != null ? !getUuid().equals(that.getUuid()) : that.getUuid() != null)
+        {
+            return false;
+        }
+        if (getId() != null ? !getId().equals(that.getId()) : that.getId() != null)
+        {
+            return false;
+        }
+        if (getName() != null ? !getName().equals(that.getName()) : that.getName() != null)
+        {
+            return false;
+        }
+        if (getProtectionDomainState() != null ?
+                !getProtectionDomainState().equals(that.getProtectionDomainState()) :
+                that.getProtectionDomainState() != null)
+        {
+            return false;
+        }
+        if (!faultSets.equals(that.faultSets))
+        {
+            return false;
+        }
+        if (!sdsList.equals(that.sdsList))
+        {
+            return false;
+        }
+        if (!storagePools.equals(that.storagePools))
+        {
+            return false;
+        }
+        return scaleIOData != null ? scaleIOData.equals(that.scaleIOData) : that.scaleIOData == null;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int result = getUuid() != null ? getUuid().hashCode() : 0;
+        result = 31 * result + (getId() != null ? getId().hashCode() : 0);
+        result = 31 * result + (getName() != null ? getName().hashCode() : 0);
+        result = 31 * result + (getProtectionDomainState() != null ? getProtectionDomainState().hashCode() : 0);
+        result = 31 * result + faultSets.hashCode();
+        result = 31 * result + sdsList.hashCode();
+        result = 31 * result + storagePools.hashCode();
+        result = 31 * result + (scaleIOData != null ? scaleIOData.hashCode() : 0);
+        return result;
+    }
 }

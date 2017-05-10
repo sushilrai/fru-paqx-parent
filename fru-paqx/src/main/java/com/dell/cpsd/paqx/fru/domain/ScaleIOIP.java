@@ -83,5 +83,10 @@ public abstract class ScaleIOIP
 
     @ManyToOne(cascade=CascadeType.ALL)
     public ScaleIOSDSElementInfo sdsElementInfo;
+
+    public void setScaleIOSDSElementInfo(final ScaleIOSDSElementInfo sdsElementInfo)
+    {
+        this.sdsElementInfo = sdsElementInfo;
+    }
 }
 
