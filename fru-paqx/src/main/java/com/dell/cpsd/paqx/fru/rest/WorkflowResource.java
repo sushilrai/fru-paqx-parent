@@ -102,7 +102,11 @@ public class WorkflowResource {
 
         final NextStep nextStep = workflowService.findNextStep(job.getWorkflow(), job.getCurrentStep());
 
-        jobRepresentation.addLink(createNextStepLink(uriInfo, job, nextStep.getNextStep()));
+        if (nextStep != null)
+        {
+            workflowService.advanceToNextStep(job, "workflowInitiated");
+            jobRepresentation.addLink(createNextStepLink(uriInfo, job, nextStep.getNextStep()));
+        }
 
         return Response.created(uriInfo.getBaseUriBuilder().path("workflow").path(job.getId().toString()).build()).entity(jobRepresentation)
                 .build();
