@@ -156,6 +156,9 @@ public class RabbitConfig {
         messageClasses.add(ConsulRegisterRequestMessage.class);
         messageClasses.add(ConsulRegisterResponseMessage.class);
 
+        messageClasses.add(com.dell.cpsd.storage.capabilities.api.ConsulRegisterRequestMessage.class);
+        messageClasses.add(com.dell.cpsd.storage.capabilities.api.ConsulRegisterResponseMessage.class);
+
         MessageAnnotationProcessor messageAnnotationProcessor = new MessageAnnotationProcessor();
         messageAnnotationProcessor.process(classMappings::put, messageClasses);
         classMapper.setIdClassMapping(classMappings);
