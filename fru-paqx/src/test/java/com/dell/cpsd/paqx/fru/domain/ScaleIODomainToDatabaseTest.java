@@ -41,7 +41,23 @@ public class ScaleIODomainToDatabaseTest
     {
         Server webServer = Server.createWebServer("-web","-webAllowOthers","-webPort","8082").start();
         Server server = Server.createTcpServer().start();//("-web","-webAllowOthers","-webPort","9092").start();
-        ScaleIOData data = new ScaleIOData(newId(), "scaleIODataName", "scaleIODataInstallID", "mdmNode", "systemVersionName", "mdmClusterState", "version");
+
+        ScaleIOData data = createScaleIODataObject();
+
+        ScaleIOData data2=testEntityManager.persist(data);
+
+        assertTrue(true);
+
+        ScaleIOData data3=testEntityManager.find(ScaleIOData.class,1l);
+
+        compareDataModels(data,data3);
+
+        java.lang.System.out.println("Hello");
+    }
+
+    private ScaleIOData createScaleIODataObject()
+    {
+        ScaleIOData data=new ScaleIOData(newId(), "scaleIODataName", "scaleIODataInstallID", "mdmNode", "systemVersionName", "mdmClusterState", "version");
 
         List<ScaleIOIP> ipList = new ArrayList<>();
         ScaleIOTiebreakerScaleIOIP ip1=new ScaleIOTiebreakerScaleIOIP(newId(),"1.2.3.4");
@@ -65,8 +81,8 @@ public class ScaleIODomainToDatabaseTest
         data.setPrimaryMDMIPList(ipList2);
 
         List<ScaleIOIP> ipList3 = new ArrayList<>();
-        ScaleIOPrimaryMDMIP ip5=new ScaleIOPrimaryMDMIP(newId(),"1.2.3.4");
-        ScaleIOPrimaryMDMIP ip6=new ScaleIOPrimaryMDMIP(newId(),"5.6.7.8");
+        ScaleIOSecondaryMDMIP ip5=new ScaleIOSecondaryMDMIP(newId(),"1.2.3.4");
+        ScaleIOSecondaryMDMIP ip6=new ScaleIOSecondaryMDMIP(newId(),"5.6.7.8");
         ipList3.add(ip5);
         ipList3.add(ip6);
 
@@ -165,18 +181,7 @@ public class ScaleIODomainToDatabaseTest
             device2.setSds(sds);
             sds.addDevice(device2);
         }
-
-
-
-        ScaleIOData data2=testEntityManager.persist(data);
-
-        assertTrue(true);
-
-        ScaleIOData data3=testEntityManager.find(ScaleIOData.class,1l);
-
-        compareDataModels(data,data3);
-
-        java.lang.System.out.println("Hello");
+        return data;
     }
 
     private void compareDataModels(final ScaleIOData data, final ScaleIOData data3)

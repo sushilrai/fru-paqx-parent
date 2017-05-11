@@ -31,6 +31,7 @@ import com.dell.cpsd.storage.capabilities.api.TieBreakersDataRestRep;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -41,6 +42,10 @@ public class ScaleIORestToScaleIODomainTransformer
 {
     public ScaleIOData transform(final ScaleIOSystemDataRestRep scaleIOSystemDataRestRep)
     {
+        if (scaleIOSystemDataRestRep == null)
+        {
+            return null;
+        }
         //Create the scaleIODataObject
         ScaleIOData returnVal = new ScaleIOData(scaleIOSystemDataRestRep.getId(), scaleIOSystemDataRestRep.getName(),
                 scaleIOSystemDataRestRep.getInstallId(), scaleIOSystemDataRestRep.getMdmMode(),
@@ -77,20 +82,28 @@ public class ScaleIORestToScaleIODomainTransformer
             final Set<ScaleIOProtectionDomain> protectionDomains, final Set<ScaleIOFaultSet> faultSets,
             final Set<ScaleIOStoragePool> storagePools)
     {
-        for (ScaleIOSDSDataRestRep sds : scaleIOSystemDataRestRep.getSdsList())
+        if (scaleIOSystemDataRestRep != null)
         {
-            ScaleIOSDS domainSDS = new ScaleIOSDS(sds.getId(), sds.getName(), sds.getSdsState(), Integer.valueOf(sds.getPort()));
-            domainSDS.setScaleIOData(returnVal);
-            returnVal.addSds(domainSDS);
+            final List<ScaleIOSDSDataRestRep> sdsRepList = scaleIOSystemDataRestRep.getSdsList();
+            if (sdsRepList != null)
+            {
+                for (ScaleIOSDSDataRestRep sds : sdsRepList)
+                {
+                    ScaleIOSDS domainSDS = new ScaleIOSDS(sds.getId(), sds.getName(), sds.getSdsState(),
+                            sds.getPort() == null ? -1 : Integer.valueOf(sds.getPort()));
+                    domainSDS.setScaleIOData(returnVal);
+                    returnVal.addSds(domainSDS);
 
-            linkSDSToProtectionDomain(domainSDS, protectionDomains, sds.getProtectionDomainId());
-            linkSDSToFaultSet(domainSDS, faultSets, sds.getFaultSetId());
+                    linkSDSToProtectionDomain(domainSDS, protectionDomains, sds.getProtectionDomainId());
+                    linkSDSToFaultSet(domainSDS, faultSets, sds.getFaultSetId());
 
-            //linkProtectionDomainToFaultSet
-            linkProtectionDomainToFaultSet(protectionDomains, faultSets, sds.getProtectionDomainId(), sds.getFaultSetId());
+                    //linkProtectionDomainToFaultSet
+                    linkProtectionDomainToFaultSet(protectionDomains, faultSets, sds.getProtectionDomainId(), sds.getFaultSetId());
 
-            linkSDSToDevices(domainSDS, sds, storagePools, protectionDomains);
+                    linkSDSToDevices(domainSDS, sds, storagePools, protectionDomains);
 
+                }
+            }
         }
 
     }
@@ -98,8 +111,13 @@ public class ScaleIORestToScaleIODomainTransformer
     private void linkProtectionDomainToFaultSet(final Set<ScaleIOProtectionDomain> protectionDomains, final Set<ScaleIOFaultSet> faultSets,
             final String protectionDomainId, final String faultSetId)
     {
-        ScaleIOProtectionDomain pd = protectionDomains.stream().filter(x -> x.getId().equals(protectionDomainId)).findFirst().orElse(null);
-        ScaleIOFaultSet fs = faultSets.stream().filter(x -> x.getId().equals(faultSetId)).findFirst().orElse(null);
+        ScaleIOProtectionDomain pd = protectionDomains == null ?
+                null :
+                protectionDomains.stream().filter(Objects::nonNull).filter(x -> x.getId().equals(protectionDomainId)).findFirst()
+                        .orElse(null);
+        ScaleIOFaultSet fs = faultSets == null ?
+                null :
+                faultSets.stream().filter(Objects::nonNull).filter(x -> x.getId().equals(faultSetId)).findFirst().orElse(null);
 
         if (pd != null && fs != null)
         {
@@ -111,23 +129,36 @@ public class ScaleIORestToScaleIODomainTransformer
     private void linkSDSToDevices(final ScaleIOSDS domainSDS, final ScaleIOSDSDataRestRep sds, final Set<ScaleIOStoragePool> storagePools,
             final Set<ScaleIOProtectionDomain> protectionDomains)
     {
-        for (ScaleIODeviceDataRestRep device : sds.getDeviceList())
+        if (sds != null)
         {
-            ScaleIODevice domainDevice = new ScaleIODevice(device.getId(), device.getName(), device.getDeviceCurrentPathName());
-            domainDevice.setSds(domainSDS);
-            domainSDS.addDevice(domainDevice);
+            final List<ScaleIODeviceDataRestRep> deviceList = sds.getDeviceList();
 
-            linkStoragePoolToDevice(domainDevice, device.getStoragePoolId(), storagePools);
-            linkStoragePoolToProtectionDomain(storagePools, device.getStoragePoolId(), protectionDomains,
-                    device.getScaleIOStoragePoolDataRestRep().getProtectionDomainId());
+            if (deviceList != null)
+            {
+                for (ScaleIODeviceDataRestRep device : deviceList)
+                {
+                    ScaleIODevice domainDevice = new ScaleIODevice(device.getId(), device.getName(), device.getDeviceCurrentPathName());
+                    domainDevice.setSds(domainSDS);
+                    domainSDS.addDevice(domainDevice);
+
+                    linkStoragePoolToDevice(domainDevice, device.getStoragePoolId(), storagePools);
+                    linkStoragePoolToProtectionDomain(storagePools, device.getStoragePoolId(), protectionDomains,
+                            device.getScaleIOStoragePoolDataRestRep().getProtectionDomainId());
+                }
+            }
         }
     }
 
     private void linkStoragePoolToProtectionDomain(final Set<ScaleIOStoragePool> storagePools, final String storagePoolId,
             final Set<ScaleIOProtectionDomain> protectionDomains, final String protectionDomainId)
     {
-        ScaleIOStoragePool storagePool = storagePools.stream().filter(x -> x.getId().equals(storagePoolId)).findFirst().orElse(null);
-        ScaleIOProtectionDomain pd = protectionDomains.stream().filter(x -> x.getId().equals(protectionDomainId)).findFirst().orElse(null);
+        ScaleIOStoragePool storagePool = storagePools == null ?
+                null :
+                storagePools.stream().filter(Objects::nonNull).filter(x -> x.getId().equals(storagePoolId)).findFirst().orElse(null);
+        ScaleIOProtectionDomain pd = protectionDomains == null ?
+                null :
+                protectionDomains.stream().filter(Objects::nonNull).filter(x -> x.getId().equals(protectionDomainId)).findFirst()
+                        .orElse(null);
 
         if (pd != null && storagePool != null)
         {
@@ -138,7 +169,9 @@ public class ScaleIORestToScaleIODomainTransformer
 
     private void linkStoragePoolToDevice(final ScaleIODevice domainDevice, final String storagePoolId, Set<ScaleIOStoragePool> storagePools)
     {
-        ScaleIOStoragePool storagePool = storagePools.stream().filter(x -> x.getId().equals(storagePoolId)).findFirst().orElse(null);
+        ScaleIOStoragePool storagePool = storagePools == null ?
+                null :
+                storagePools.stream().filter(Objects::nonNull).filter(x -> x.getId().equals(storagePoolId)).findFirst().orElse(null);
         if (storagePool != null)
         {
             storagePool.addDevice(domainDevice);
@@ -148,7 +181,9 @@ public class ScaleIORestToScaleIODomainTransformer
 
     private void linkSDSToFaultSet(final ScaleIOSDS domainSDS, final Set<ScaleIOFaultSet> faultSets, final String faultSetId)
     {
-        ScaleIOFaultSet fs = faultSets.stream().filter(x -> x.getId().equals(faultSetId)).findFirst().orElse(null);
+        ScaleIOFaultSet fs = faultSets == null ?
+                null :
+                faultSets.stream().filter(Objects::nonNull).filter(x -> x.getId().equals(faultSetId)).findFirst().orElse(null);
 
         if (fs != null)
         {
@@ -160,7 +195,10 @@ public class ScaleIORestToScaleIODomainTransformer
     private void linkSDSToProtectionDomain(final ScaleIOSDS domainSDS, final Set<ScaleIOProtectionDomain> protectionDomains,
             final String protectionDomainId)
     {
-        ScaleIOProtectionDomain pd = protectionDomains.stream().filter(x -> x.getId().equals(protectionDomainId)).findFirst().orElse(null);
+        ScaleIOProtectionDomain pd = protectionDomains == null ?
+                null :
+                protectionDomains.stream().filter(Objects::nonNull).filter(x -> x.getId().equals(protectionDomainId)).findFirst()
+                        .orElse(null);
 
         if (pd != null)
         {
@@ -171,182 +209,265 @@ public class ScaleIORestToScaleIODomainTransformer
 
     private void linkProtectionDomainsToData(final Set<ScaleIOProtectionDomain> protectionDomains, final ScaleIOData returnVal)
     {
-        for (ScaleIOProtectionDomain domain : protectionDomains)
+        if (protectionDomains != null)
         {
-            domain.setScaleIOData(returnVal);
-            returnVal.addProtectionDomain(domain);
+            for (ScaleIOProtectionDomain domain : protectionDomains)
+            {
+                domain.setScaleIOData(returnVal);
+                returnVal.addProtectionDomain(domain);
+            }
         }
     }
 
     private Set<ScaleIOStoragePool> findStoragePoolsFromSDS(final List<ScaleIOSDSDataRestRep> sdsList)
     {
-        return sdsList.stream().map(x -> x.getDeviceList()).flatMap(List::stream)
-                .map(y -> createStoragePoolFromRest(y.getScaleIOStoragePoolDataRestRep())).collect(Collectors.toSet());
+        return sdsList == null ?
+                null :
+                sdsList.stream().filter(Objects::nonNull).map(x -> x.getDeviceList()).flatMap(List::stream)
+                        .map(y -> createStoragePoolFromRest(y.getScaleIOStoragePoolDataRestRep())).collect(Collectors.toSet());
     }
 
     private ScaleIOStoragePool createStoragePoolFromRest(final ScaleIOStoragePoolDataRestRep scaleIOStoragePoolDataRestRep)
     {
+        if (scaleIOStoragePoolDataRestRep == null)
+        {
+            return null;
+        }
         return new ScaleIOStoragePool(scaleIOStoragePoolDataRestRep.getId(), scaleIOStoragePoolDataRestRep.getName(),
-                Integer.valueOf(scaleIOStoragePoolDataRestRep.getCapacityAvailableForVolumeAllocationInKb()),
-                Integer.valueOf(scaleIOStoragePoolDataRestRep.getMaxCapacityInKb()),
-                Integer.valueOf(scaleIOStoragePoolDataRestRep.getNumOfVolumes()));
+                scaleIOStoragePoolDataRestRep.getCapacityAvailableForVolumeAllocationInKb() == null ?
+                        -1 :
+                        Integer.valueOf(scaleIOStoragePoolDataRestRep.getCapacityAvailableForVolumeAllocationInKb()),
+                scaleIOStoragePoolDataRestRep.getMaxCapacityInKb() == null ?
+                        -1 :
+                        Integer.valueOf(scaleIOStoragePoolDataRestRep.getMaxCapacityInKb()),
+                scaleIOStoragePoolDataRestRep.getNumOfVolumes() == null ?
+                        -1 :
+                        Integer.valueOf(scaleIOStoragePoolDataRestRep.getNumOfVolumes()));
     }
 
     private Set<ScaleIOProtectionDomain> findProtectionDomainsFromSDS(final List<ScaleIOSDSDataRestRep> sdsList)
     {
-
-        return sdsList.stream().map(x -> x.getScaleIOProtectionDomainDataRestRep()).map(y -> createProtectionDomainFromRest(y))
-                .collect(Collectors.toSet());
+        return sdsList == null ?
+                null :
+                sdsList.stream().filter(Objects::nonNull).map(x -> x.getScaleIOProtectionDomainDataRestRep())
+                        .map(y -> createProtectionDomainFromRest(y)).collect(Collectors.toSet());
     }
 
     private Set<ScaleIOFaultSet> findFaultSetsFromSDS(final List<ScaleIOSDSDataRestRep> sdsList)
     {
-
-        return sdsList.stream().map(x -> x.getScaleIOFaultSetDataRestRep()).map(y -> createFaultSetFromRest(y)).collect(Collectors.toSet());
+        return sdsList == null ?
+                null :
+                sdsList.stream().filter(Objects::nonNull).map(x -> x.getScaleIOFaultSetDataRestRep()).map(y -> createFaultSetFromRest(y))
+                        .collect(Collectors.toSet());
     }
 
     private ScaleIOFaultSet createFaultSetFromRest(final ScaleIOFaultSetDataRestRep y)
     {
+        if (y == null)
+        {
+            return null;
+        }
         return new ScaleIOFaultSet(y.getId(), y.getName());
     }
 
     private ScaleIOProtectionDomain createProtectionDomainFromRest(final ScaleIOProtectionDomainDataRestRep y)
     {
+        if (y == null)
+        {
+            return null;
+        }
         return new ScaleIOProtectionDomain(y.getId(), y.getName(), y.getProtectionDomainState());
     }
 
     private void linkMDMCluster(final ScaleIOData returnVal, final ScaleIOSystemDataRestRep scaleIOSystemDataRestRep)
     {
-        final MdmClusterDataRestRep cluster = scaleIOSystemDataRestRep.getMdmClusterDataRestRep();
-        ScaleIOMdmCluster domainCluster = new ScaleIOMdmCluster(cluster.getId(), cluster.getName(), cluster.getClusterState(),
-                cluster.getClusterMode(), Integer.getInteger(cluster.getGoodNodesNum()), Integer.valueOf(cluster.getGoodReplicasNum()));
-        domainCluster.setScaleIOData(returnVal);
-        returnVal.setMdmCluster(domainCluster);
+        if (scaleIOSystemDataRestRep != null)
+        {
+            final MdmClusterDataRestRep cluster = scaleIOSystemDataRestRep.getMdmClusterDataRestRep();
+            if (cluster != null)
+            {
+                ScaleIOMdmCluster domainCluster = new ScaleIOMdmCluster(cluster.getId(), cluster.getName(), cluster.getClusterState(),
+                        cluster.getClusterMode(), cluster.getGoodNodesNum() == null ? -1 : Integer.getInteger(cluster.getGoodNodesNum()),
+                        cluster.getGoodReplicasNum() == null ? -1 : Integer.valueOf(cluster.getGoodReplicasNum()));
+                domainCluster.setScaleIOData(returnVal);
+                returnVal.setMdmCluster(domainCluster);
 
-        //Now need to add master, slave and tiebreaker
-        addMasterToCluster(domainCluster, cluster.getMasterDataRestRep());
-        addSlavesToCluster(domainCluster, cluster.getSlaves());
-        addTiebreakersToCluster(domainCluster, cluster.getTieBreakers());
+                //Now need to add master, slave and tiebreaker
+                addMasterToCluster(domainCluster, cluster.getMasterDataRestRep());
+                addSlavesToCluster(domainCluster, cluster.getSlaves());
+                addTiebreakersToCluster(domainCluster, cluster.getTieBreakers());
+            }
+        }
     }
 
     private void addTiebreakersToCluster(final ScaleIOMdmCluster domainCluster, final List<TieBreakersDataRestRep> tieBreakers)
     {
-        for (TieBreakersDataRestRep tiebreaker : tieBreakers)
+        if (tieBreakers != null)
         {
-            addTiebreakerToCluster(domainCluster, tiebreaker);
+            for (TieBreakersDataRestRep tiebreaker : tieBreakers)
+            {
+                addTiebreakerToCluster(domainCluster, tiebreaker);
+            }
         }
     }
 
     private void addTiebreakerToCluster(final ScaleIOMdmCluster domainCluster, final TieBreakersDataRestRep tiebreaker)
     {
-        ScaleIOTiebreakerElementInfo domainTiebreaker = new ScaleIOTiebreakerElementInfo(tiebreaker.getId(),
-                Integer.valueOf(tiebreaker.getPort()), tiebreaker.getVersionInfo(), tiebreaker.getName(), tiebreaker.getRole(),
-                tiebreaker.getStatus());
-        domainCluster.addTiebreaker(domainTiebreaker);
-        domainTiebreaker.setMdmCluster(domainCluster);
-        //Now add ips and management ips
-        addIPs(domainTiebreaker, tiebreaker.getIps());
-        addManagementIPs(domainTiebreaker, tiebreaker.getManagementIPs());
+        if (tiebreaker != null)
+        {
+            ScaleIOTiebreakerElementInfo domainTiebreaker = new ScaleIOTiebreakerElementInfo(tiebreaker.getId(),
+                    Integer.valueOf(tiebreaker.getPort()), tiebreaker.getVersionInfo(), tiebreaker.getName(), tiebreaker.getRole(),
+                    tiebreaker.getStatus());
+            domainCluster.addTiebreaker(domainTiebreaker);
+            domainTiebreaker.setMdmCluster(domainCluster);
+            //Now add ips and management ips
+            addIPs(domainTiebreaker, tiebreaker.getIps());
+            addManagementIPs(domainTiebreaker, tiebreaker.getManagementIPs());
+        }
     }
 
     private void addSlavesToCluster(final ScaleIOMdmCluster domainCluster, final List<SlavesDataRestRep> slaves)
     {
-        for (SlavesDataRestRep slave : slaves)
+        if (slaves != null)
         {
-            addSlaveToCluster(domainCluster, slave);
+            for (SlavesDataRestRep slave : slaves)
+            {
+                addSlaveToCluster(domainCluster, slave);
+            }
         }
     }
 
     private void addSlaveToCluster(final ScaleIOMdmCluster domainCluster, final SlavesDataRestRep slave)
     {
-        ScaleIOSlaveElementInfo domainSlave = new ScaleIOSlaveElementInfo(slave.getId(), Integer.valueOf(slave.getPort()),
-                slave.getVersionInfo(), slave.getName(), slave.getRole(), slave.getStatus());
-        domainCluster.addSlave(domainSlave);
-        domainSlave.setMdmCluster(domainCluster);
-        //Now add ips and management ips
-        addIPs(domainSlave, slave.getIps());
-        addManagementIPs(domainSlave, slave.getManagementIPs());
+        if (slave != null)
+        {
+            ScaleIOSlaveElementInfo domainSlave = new ScaleIOSlaveElementInfo(slave.getId(), Integer.valueOf(slave.getPort()),
+                    slave.getVersionInfo(), slave.getName(), slave.getRole(), slave.getStatus());
+            domainCluster.addSlave(domainSlave);
+            domainSlave.setMdmCluster(domainCluster);
+            //Now add ips and management ips
+            addIPs(domainSlave, slave.getIps());
+            addManagementIPs(domainSlave, slave.getManagementIPs());
+        }
     }
 
     private void addMasterToCluster(final ScaleIOMdmCluster domainCluster, final MasterDataRestRep masterDataRestRep)
     {
-        ScaleIOMasterElementInfo master = new ScaleIOMasterElementInfo(masterDataRestRep.getId(),
-                Integer.valueOf(masterDataRestRep.getPort()), masterDataRestRep.getVersionInfo(), masterDataRestRep.getName(),
-                masterDataRestRep.getRole());
-        domainCluster.addMaster(master);
-        master.setMdmCluster(domainCluster);
-        //Now add ips and management ips
-        addIPs(master, masterDataRestRep.getIps());
-        addManagementIPs(master, masterDataRestRep.getManagementIPs());
+        if (masterDataRestRep != null)
+        {
+            ScaleIOMasterElementInfo master = new ScaleIOMasterElementInfo(masterDataRestRep.getId(),
+                    Integer.valueOf(masterDataRestRep.getPort()), masterDataRestRep.getVersionInfo(), masterDataRestRep.getName(),
+                    masterDataRestRep.getRole());
+            domainCluster.addMaster(master);
+            master.setMdmCluster(domainCluster);
+            //Now add ips and management ips
+            addIPs(master, masterDataRestRep.getIps());
+            addManagementIPs(master, masterDataRestRep.getManagementIPs());
+        }
     }
 
     private void addIPs(final ScaleIOSDSElementInfo master, final List<String> ips)
     {
-        for (String ip : ips)
+        if (ips != null)
         {
-            ScaleIOMasterScaleIOIP domainIP = new ScaleIOMasterScaleIOIP(master.getId(), ip);
-            domainIP.setScaleIOSDSElementInfo(master);
-            master.addIP(domainIP);
+            for (String ip : ips)
+            {
+                ScaleIOMasterScaleIOIP domainIP = new ScaleIOMasterScaleIOIP(master.getId(), ip);
+                domainIP.setScaleIOSDSElementInfo(master);
+                master.addIP(domainIP);
+            }
         }
     }
 
     private void addManagementIPs(final ScaleIOSDSElementInfo master, final List<String> ips)
     {
-        for (String ip : ips)
+        if (ips != null)
         {
-            ScaleIOMasterScaleIOIP domainIP = new ScaleIOMasterScaleIOIP(master.getId(), ip);
-            domainIP.setScaleIOSDSElementInfo(master);
-            master.addManagementIP(domainIP);
+            for (String ip : ips)
+            {
+                ScaleIOMasterScaleIOIP domainIP = new ScaleIOMasterScaleIOIP(master.getId(), ip);
+                domainIP.setScaleIOSDSElementInfo(master);
+                master.addManagementIP(domainIP);
+            }
         }
     }
 
     private void linkSDCs(final ScaleIOData returnVal, final ScaleIOSystemDataRestRep scaleIOSystemDataRestRep)
     {
-        for (ScaleIOSDCDataRestRep sdc : scaleIOSystemDataRestRep.getSdcList())
+        if (scaleIOSystemDataRestRep != null)
         {
-            ScaleIOSDC domainSDC = new ScaleIOSDC(sdc.getId(), sdc.getName(), sdc.getSdcIp(), sdc.getSdcGuid(),
-                    sdc.getMdmConnectionState());
-            domainSDC.setScaleIOData(returnVal);
-            returnVal.addSdc(domainSDC);
+            final List<ScaleIOSDCDataRestRep> repSdcList = scaleIOSystemDataRestRep.getSdcList();
+            if (repSdcList != null)
+            {
+                for (ScaleIOSDCDataRestRep sdc : repSdcList)
+                {
+                    ScaleIOSDC domainSDC = new ScaleIOSDC(sdc.getId(), sdc.getName(), sdc.getSdcIp(), sdc.getSdcGuid(),
+                            sdc.getMdmConnectionState());
+                    domainSDC.setScaleIOData(returnVal);
+                    returnVal.addSdc(domainSDC);
+                }
+            }
         }
     }
 
     private void linkSecondaryMdmIPList(final ScaleIOData returnVal, final ScaleIOSystemDataRestRep scaleIOSystemDataRestRep)
     {
-        //Link secondaryMdmActorIpList
-        List<ScaleIOIP> secondaryMdmActorIps = new ArrayList<>();
-        for (String ip : scaleIOSystemDataRestRep.getSecondaryMdmActorIpList())
+        if (scaleIOSystemDataRestRep != null)
         {
-            ScaleIOIP domainIP = new ScaleIOSecondaryMDMIP(returnVal.getId(), ip);
-            domainIP.setScaleIOData(returnVal);
-            secondaryMdmActorIps.add(domainIP);
+            final List<String> secondaryMdmActorIpList = scaleIOSystemDataRestRep.getSecondaryMdmActorIpList();
+            if (secondaryMdmActorIpList != null)
+            {
+                //Link secondaryMdmActorIpList
+                List<ScaleIOIP> secondaryMdmActorIps = new ArrayList<>();
+                for (String ip : secondaryMdmActorIpList)
+                {
+                    ScaleIOIP domainIP = new ScaleIOSecondaryMDMIP(returnVal.getId(), ip);
+                    domainIP.setScaleIOData(returnVal);
+                    secondaryMdmActorIps.add(domainIP);
+                }
+                returnVal.setSecondaryMDMIPList(secondaryMdmActorIps);
+            }
         }
-        returnVal.setSecondaryMDMIPList(secondaryMdmActorIps);
     }
 
     private void linkPrimaryMdmIPList(final ScaleIOData returnVal, final ScaleIOSystemDataRestRep scaleIOSystemDataRestRep)
     {
-        //Link primaryMdmActorIpList
-        List<ScaleIOIP> primaryMdmActorIps = new ArrayList<>();
-        for (String ip : scaleIOSystemDataRestRep.getPrimaryMdmActorIpList())
+        if (scaleIOSystemDataRestRep != null)
         {
-            ScaleIOIP domainIP = new ScaleIOPrimaryMDMIP(returnVal.getId(), ip);
-            domainIP.setScaleIOData(returnVal);
-            primaryMdmActorIps.add(domainIP);
+            final List<String> primaryMdmActorIpList = scaleIOSystemDataRestRep.getPrimaryMdmActorIpList();
+
+            if (primaryMdmActorIpList != null)
+            {
+                //Link primaryMdmActorIpList
+                List<ScaleIOIP> primaryMdmActorIps = new ArrayList<>();
+                for (String ip : primaryMdmActorIpList)
+                {
+                    ScaleIOIP domainIP = new ScaleIOPrimaryMDMIP(returnVal.getId(), ip);
+                    domainIP.setScaleIOData(returnVal);
+                    primaryMdmActorIps.add(domainIP);
+                }
+                returnVal.setPrimaryMDMIPList(primaryMdmActorIps);
+            }
         }
-        returnVal.setPrimaryMDMIPList(primaryMdmActorIps);
     }
 
     private void linkTieBreakerMdmIPList(final ScaleIOData returnVal, final ScaleIOSystemDataRestRep scaleIOSystemDataRestRep)
     {
-        //Link tiebreakerMdmIPList
-        List<ScaleIOIP> tiebreakerDomainIps = new ArrayList<>();
-        for (String ip : scaleIOSystemDataRestRep.getTiebreakerMdmIpList())
+        if (scaleIOSystemDataRestRep != null)
         {
-            ScaleIOIP domainIP = new ScaleIOTiebreakerScaleIOIP(returnVal.getId(), ip);
-            domainIP.setScaleIOData(returnVal);
-            tiebreakerDomainIps.add(domainIP);
+            final List<String> tiebreakerMdmIpList = scaleIOSystemDataRestRep.getTiebreakerMdmIpList();
+            if (tiebreakerMdmIpList != null)
+            {
+                //Link tiebreakerMdmIPList
+                List<ScaleIOIP> tiebreakerDomainIps = new ArrayList<>();
+                for (String ip : tiebreakerMdmIpList)
+                {
+                    ScaleIOIP domainIP = new ScaleIOTiebreakerScaleIOIP(returnVal.getId(), ip);
+                    domainIP.setScaleIOData(returnVal);
+                    tiebreakerDomainIps.add(domainIP);
+                }
+                returnVal.setTiebreakerScaleIOList(tiebreakerDomainIps);
+            }
         }
-        returnVal.setTiebreakerScaleIOList(tiebreakerDomainIps);
     }
 }
