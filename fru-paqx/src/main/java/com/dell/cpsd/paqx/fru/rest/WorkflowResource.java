@@ -251,29 +251,49 @@ public class WorkflowResource {
     @POST
     @Consumes("application/vnd.dellemc.scaleio.endpoint+json")
     @Path("{jobId}/{step}")
-    public Response captureScaleIO(@PathParam("jobId") String jobId, @PathParam("step") String step, @Context UriInfo uriInfo,
-                                   EndpointCredentials scaleIOCredentials) {
+    public void captureScaleIO(@Suspended final AsyncResponse asyncResponse, @PathParam("jobId") String jobId,
+            @PathParam("step") String step, @Context UriInfo uriInfo, EndpointCredentials scaleIOCredentials) {
+        asyncResponse.setTimeoutHandler(asyncResponse1 -> asyncResponse1
+                .resume(Response.status(Response.Status.SERVICE_UNAVAILABLE).entity("{\"status\":\"timeout\"}").build()));
+        asyncResponse.setTimeout(10, TimeUnit.SECONDS);
+
         final String thisStep = findStepFromPath(uriInfo);
         final Job job = workflowService.findJob(UUID.fromString(jobId));
         final JobRepresentation jobRepresentation = new JobRepresentation(job);
 
-        final URL url;
         try {
-            url = new URL(scaleIOCredentials.getEndpointUrl());
+            new URL(scaleIOCredentials.getEndpointUrl());
         } catch (MalformedURLException e) {
+            LOG.warn("Invalid URL found {}", scaleIOCredentials.getEndpointUrl());
             jobRepresentation.addLink(createRetryStepLink(uriInfo, job, thisStep));
-            return Response.status(Response.Status.BAD_REQUEST).entity(jobRepresentation).build();
+            jobRepresentation.setLastResponse(e.getLocalizedMessage());
+            Response.status(Response.Status.BAD_REQUEST).entity(jobRepresentation).build();
+            return;
         }
 
-        job.addScaleIOCredentials(scaleIOCredentials);
+        final CompletableFuture<ConsulRegistryResult> consulRegistryResultCompletableFuture = scaleIOService
+                .requestConsulRegistration(scaleIOCredentials);
+        consulRegistryResultCompletableFuture.thenAccept(consulRegistryResult ->
+        {
+            if (consulRegistryResult.isSuccess()) {
+                LOG.info("Consul registration successfully completed");
 
-        final NextStep nextStep = workflowService.findNextStep(job.getWorkflow(), thisStep);
-        if (nextStep != null) {
-            workflowService.advanceToNextStep(job, thisStep);
-            jobRepresentation.addLink(createNextStepLink(uriInfo, job, nextStep.getNextStep()), findMethodFromStep(nextStep.getNextStep()));
-        }
+                job.addScaleIOCredentials(scaleIOCredentials);
 
-        return Response.ok(jobRepresentation).build();
+                final NextStep nextStep = workflowService.findNextStep(job.getWorkflow(), thisStep);
+                if (nextStep != null) {
+                    workflowService.advanceToNextStep(job, thisStep);
+                    jobRepresentation
+                            .addLink(createNextStepLink(uriInfo, job, nextStep.getNextStep()), findMethodFromStep(nextStep.getNextStep()));
+                }
+                asyncResponse.resume(Response.ok(jobRepresentation).build());
+            } else {
+                LOG.info("Consul registration failed {}", consulRegistryResult.getDescription());
+                jobRepresentation.addLink(createRetryStepLink(uriInfo, job, thisStep));
+                jobRepresentation.setLastResponse(consulRegistryResult.getDescription());
+                asyncResponse.resume(Response.status(Response.Status.BAD_REQUEST).entity(jobRepresentation).build());
+            }
+        });
     }
 
     @POST

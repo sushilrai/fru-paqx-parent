@@ -75,7 +75,7 @@ public class ConsumerConfig {
     @Bean
     DefaultMessageListener fruMessageListener() {
         return new DefaultMessageListener(messageConverter, listNodesResponseHandler(), listStorageResponseHandler(),
-                vCenterDiscoverResponseHandler(), vCenterConsulRegisterResponseHandler());
+                vCenterDiscoverResponseHandler(), vCenterConsulRegisterResponseHandler(), scaleIOConsulRegisterResponseHandler());
     }
 
     @Bean
@@ -142,5 +142,10 @@ public class ConsumerConfig {
     @Bean
     DiscoveryInfoToVCenterSystemPropertiesTransformer discoveryInfoToVCenterSystemPropertiesTransformer() {
         return new DiscoveryInfoToVCenterSystemPropertiesTransformer();
+    }
+
+    @Bean
+    ScaleIOConsulRegisterResponseHandler scaleIOConsulRegisterResponseHandler() {
+        return new ScaleIOConsulRegisterResponseHandler(messageErrorTransformer());
     }
 }
