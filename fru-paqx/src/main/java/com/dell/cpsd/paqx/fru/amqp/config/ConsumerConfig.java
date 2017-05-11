@@ -151,6 +151,7 @@ public class ConsumerConfig {
         return new ScaleIOConsulRegisterResponseHandler(messageErrorTransformer());
     }
 
+    @Bean
     ScaleIORestToScaleIODomainTransformer scaleIORestToScaleIODomainTransformer()
     {
         return new ScaleIORestToScaleIODomainTransformer();
