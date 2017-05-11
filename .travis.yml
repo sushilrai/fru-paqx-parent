@@ -1,6 +1,6 @@
-anguage: java
-	jdk:
-	 - oraclejdk8
-	script:
-	 - mvn clean compile
-	 - mvn test
+language: java
+jdk:
+  - oraclejdk8
+script:
+  - mvn clean compile
+  - mvn test
