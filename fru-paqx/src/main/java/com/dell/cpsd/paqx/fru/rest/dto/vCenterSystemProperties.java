@@ -13,4 +13,9 @@ public class vCenterSystemProperties {
     public void setDataCenters(final List<DataCenterDto> dataCenters) {
         this.dataCenters = dataCenters;
     }
+
+    public List<DataCenterDto> getDataCenters()
+    {
+        return dataCenters;
+    }
 }

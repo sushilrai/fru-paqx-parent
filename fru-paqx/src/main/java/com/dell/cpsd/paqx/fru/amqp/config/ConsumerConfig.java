@@ -18,6 +18,7 @@ import com.dell.cpsd.paqx.fru.amqp.model.Error;
 import com.dell.cpsd.paqx.fru.amqp.model.FruErrorMessage;
 import com.dell.cpsd.paqx.fru.amqp.model.MessageProperties;
 import com.dell.cpsd.paqx.fru.transformers.DiscoveryInfoToVCenterSystemPropertiesTransformer;
+import com.dell.cpsd.paqx.fru.transformers.ScaleIORestToScaleIODomainTransformer;
 import org.aopalliance.aop.Advice;
 import org.springframework.amqp.core.AcknowledgeMode;
 import org.springframework.amqp.core.Queue;
@@ -145,7 +146,13 @@ public class ConsumerConfig {
     }
 
     @Bean
-    ScaleIOConsulRegisterResponseHandler scaleIOConsulRegisterResponseHandler() {
+    ScaleIOConsulRegisterResponseHandler scaleIOConsulRegisterResponseHandler()
+    {
         return new ScaleIOConsulRegisterResponseHandler(messageErrorTransformer());
+    }
+
+    ScaleIORestToScaleIODomainTransformer scaleIORestToScaleIODomainTransformer()
+    {
+        return new ScaleIORestToScaleIODomainTransformer();
     }
 }

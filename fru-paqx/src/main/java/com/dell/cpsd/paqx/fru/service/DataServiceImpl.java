@@ -6,9 +6,13 @@
 package com.dell.cpsd.paqx.fru.service;
 
 
+import com.dell.cpsd.paqx.fru.domain.ScaleIOData;
 import com.dell.cpsd.paqx.fru.dto.FRUSystemData;
 import com.dell.cpsd.paqx.fru.rest.dto.vCenterSystemProperties;
+import com.dell.cpsd.paqx.fru.rest.repository.DataServiceRepository;
+import com.dell.cpsd.paqx.fru.transformers.ScaleIORestToScaleIODomainTransformer;
 import com.dell.cpsd.storage.capabilities.api.ScaleIOSystemDataRestRep;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -24,6 +28,19 @@ public class DataServiceImpl implements DataService {
 
     private final Map<UUID, FRUSystemData> jobIdFRUSystemData = new HashMap<>();
 
+    @Autowired
+    DataServiceRepository repository;
+
+    @Autowired
+    ScaleIORestToScaleIODomainTransformer scaleIORestToScaleIODomainTransformer;
+
+    @Autowired
+    public DataServiceImpl(DataServiceRepository repository, ScaleIORestToScaleIODomainTransformer scaleIORestToScaleIODomainTransformer)
+    {
+        this.repository=repository;
+        this.scaleIORestToScaleIODomainTransformer=scaleIORestToScaleIODomainTransformer;
+    }
+
     @Override
     public FRUSystemData getData(UUID jobId) {
         return ensureSystemDataExists(jobId);
@@ -31,6 +48,8 @@ public class DataServiceImpl implements DataService {
 
     @Override
     public void saveScaleioData(final UUID jobId, final ScaleIOSystemDataRestRep scaleIOSystemDataRestRep) {
+        ScaleIOData data = scaleIORestToScaleIODomainTransformer.transform(scaleIOSystemDataRestRep);
+        repository.saveScaleIOData(jobId,data);
         FRUSystemData fruSystemData = ensureSystemDataExists(jobId);
         fruSystemData.setScaleIOData(scaleIOSystemDataRestRep);
     }
