@@ -106,6 +106,14 @@
         </dependency>
 
         <dependency>
+            <artifactId>discovered-nodes-capabilities-api</artifactId>
+            <groupId>com.dell.converged.capabilities.compute</groupId>
+            <version>1.1-SNAPSHOT</version>
+            <type>zip</type>
+            <classifier>schemas</classifier>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
         </dependency>
@@ -312,6 +320,18 @@
                             <includes>**\/*.jsd</includes>
                         </configuration>
                     </execution>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <id>unpack-json-schemas-compute-discovered-nodes-capabilities-api</id>
+                        <goals>
+                            <goal>unpack-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <includeGroupIds>com.dell.converged.capabilities.compute</includeGroupIds>
+                            <includeArtifactIds>discovered-nodes-capabilities-api</includeArtifactIds>
+                            <includes>**\/*.jsd</includes>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
             <plugin>
@@ -389,6 +409,29 @@
                             </customAnnotator>
                             <customRuleFactory>
                                 com.dell.cpsd.common.contract.enricher.plugins.jsonschema2pojo.DefaultRuleFactory
+                            </customRuleFactory>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-json-model-compute-discovered-nodes-capabilities-api</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <sourceDirectory>${project.build.directory}/dependency/discovered-nodes-capabilities/schema/json
+                            </sourceDirectory>
+                            <targetPackage>com.dell.converged.capabilities.compute.discovered.nodes.api</targetPackage>
+                            <outputDirectory>${project.build.directory}/generated-sources/discovered-nodes-capabilities</outputDirectory>
+                            <useLongIntegers>true</useLongIntegers>
+                            <removeOldOutput>true</removeOldOutput>
+                            <generateBuilders>true</generateBuilders>
+                            <includeConstructors>true</includeConstructors>
+                            <includeAdditionalProperties>true</includeAdditionalProperties>
+                            <serializable>false</serializable>
+                            <customAnnotator>com.dell.cpsd.common.contract.enricher.plugins.jsonschema2pojo.MessageAnnotator
+                            </customAnnotator>
+                            <customRuleFactory>com.dell.cpsd.common.contract.enricher.plugins.jsonschema2pojo.DefaultRuleFactory
                             </customRuleFactory>
                         </configuration>
                     </execution>
