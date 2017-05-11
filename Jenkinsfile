@@ -49,7 +49,7 @@ pipeline {
 	    stage('Package') {
 	        when {
                 expression {
-                    return env.BRANCH_NAME ==~ /master|develop|release\/.*/
+                    return !(env.BRANCH_NAME ==~ /master|develop|release\/.*/)
                 }
             }
 		    steps {
@@ -59,7 +59,7 @@ pipeline {
         stage('Deploy') {
 	        when {
                 expression {
-                    return env.BRANCH_NAME ==~ /develop|release\/.*/
+                    return env.BRANCH_NAME ==~ /master|develop|release\/.*/
                 }
             }
             steps {
