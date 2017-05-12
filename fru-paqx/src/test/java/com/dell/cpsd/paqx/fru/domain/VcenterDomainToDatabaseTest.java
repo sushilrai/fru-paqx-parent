@@ -30,12 +30,18 @@ public class VcenterDomainToDatabaseTest
     @Test
     public void test() throws Exception
     {
+        // Create a vcenter instance
+        VCenter vCenter = new VCenter(newId(), "vc-1");
+        testEntityManager.persist(vCenter);
+
         // Create datacenter and persist entry
         Datacenter dc = new Datacenter(newId(), "dc-1");
+        dc.setvCenter(vCenter);
         testEntityManager.persist(dc);
 
         Datacenter dcQuery = testEntityManager.find(Datacenter.class,1l);
         assertTrue(dc.equals(dcQuery));
+        assertTrue(vCenter.equals(dcQuery.getvCenter()));
 
         // Create clusters
         Cluster cluster1 = new Cluster(newId(), "domain-01");

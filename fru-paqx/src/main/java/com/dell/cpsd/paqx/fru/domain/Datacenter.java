@@ -4,9 +4,6 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by britney2k on 5/9/17.
- */
 @Entity
 @Table(name = "DATACENTER")
 public class Datacenter {
@@ -34,6 +31,9 @@ public class Datacenter {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "datacenter", orphanRemoval = true)
     private List<Cluster> clusterList = new ArrayList<>();
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    private VCenter vCenter;
 
     public Long getUuid() {
         return uuid;
@@ -93,5 +93,13 @@ public class Datacenter {
 
     public void setClusterList(List<Cluster> clusterList) {
         this.clusterList = clusterList;
+    }
+
+    public VCenter getvCenter() {
+        return vCenter;
+    }
+
+    public void setvCenter(VCenter vCenter) {
+        this.vCenter = vCenter;
     }
 }
