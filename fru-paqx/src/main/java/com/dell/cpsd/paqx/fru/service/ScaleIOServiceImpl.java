@@ -6,11 +6,7 @@
 package com.dell.cpsd.paqx.fru.service;
 
 import com.dell.cpsd.hdp.capability.registry.api.Capability;
-import com.dell.cpsd.hdp.capability.registry.api.CapabilityProvider;
-import com.dell.cpsd.hdp.capability.registry.api.EndpointProperty;
 import com.dell.cpsd.hdp.capability.registry.client.CapabilityRegistryException;
-import com.dell.cpsd.hdp.capability.registry.client.ICapabilityRegistryLookupManager;
-import com.dell.cpsd.hdp.capability.registry.client.callback.ListCapabilityProvidersResponse;
 import com.dell.cpsd.paqx.fru.amqp.consumer.handler.AsyncAcknowledgement;
 import com.dell.cpsd.paqx.fru.dto.ConsulRegistryResult;
 import com.dell.cpsd.paqx.fru.rest.dto.EndpointCredentials;
@@ -22,11 +18,6 @@ import com.dell.cpsd.storage.capabilities.api.RegistrationInfo;
 import com.dell.cpsd.storage.capabilities.api.ScaleIOSystemDataRestRep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.amqp.core.AmqpAdmin;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.Queue;
-import org.springframework.amqp.core.TopicExchange;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -38,8 +29,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * Copyright &copy; 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
@@ -50,177 +39,105 @@ public class ScaleIOServiceImpl implements ScaleIOService
 {
     private static final Logger LOG = LoggerFactory.getLogger(ScaleIOServiceImpl.class);
 
-    private final ICapabilityRegistryLookupManager capabilityRegistryLookupManager;
-    private final RabbitTemplate                   rabbitTemplate;
-    private final AmqpAdmin                        amqpAdmin;
-    private final Queue                            responseQueue;
-    private final AsyncAcknowledgement             asyncAcknowledgement;
-    private final String                           replyTo;
+    private final AsyncAcknowledgement asyncAcknowledgement;
+    private final String               replyTo;
+    private final FruService           fruService;
 
     private final AsyncAcknowledgement consulRegisterAsyncAcknowledgement;
 
     @Autowired
-    public ScaleIOServiceImpl(final ICapabilityRegistryLookupManager capabilityRegistryLookupManager, final RabbitTemplate rabbitTemplate,
-            final AmqpAdmin amqpAdmin, final Queue responseQueue,
-            @Qualifier(value = "listStorageResponseHandler") final AsyncAcknowledgement asyncAcknowledgement,
+    public ScaleIOServiceImpl(@Qualifier(value = "listStorageResponseHandler") final AsyncAcknowledgement asyncAcknowledgement,
             @Qualifier(value = "scaleIOConsulRegisterResponseHandler") final AsyncAcknowledgement consulRegisterAsyncAcknowledgement,
-            final String replyTo)
+            final String replyTo, final FruService fruService)
     {
-        this.capabilityRegistryLookupManager = capabilityRegistryLookupManager;
-        this.rabbitTemplate = rabbitTemplate;
-        this.amqpAdmin = amqpAdmin;
-        this.responseQueue = responseQueue;
         this.asyncAcknowledgement = asyncAcknowledgement;
         this.consulRegisterAsyncAcknowledgement = consulRegisterAsyncAcknowledgement;
         this.replyTo = replyTo;
+        this.fruService = fruService;
     }
 
     public CompletableFuture<ScaleIOSystemDataRestRep> listStorage(final EndpointCredentials scaleIOCredentials)
     {
         final String requiredCapability = "coprhd-list-storage";
+
         try
         {
-            final ListCapabilityProvidersResponse listCapabilityProvidersResponse = capabilityRegistryLookupManager
-                    .listCapabilityProviders(TimeUnit.SECONDS.toMillis(5));
+            new URL(scaleIOCredentials.getEndpointUrl());
+        }
+        catch (MalformedURLException e)
+        {
+            final CompletableFuture<ScaleIOSystemDataRestRep> promise = new CompletableFuture<>();
+            return fruService.malformedUrlException(e, promise);
+        }
 
-            for (final CapabilityProvider capabilityProvider : listCapabilityProvidersResponse.getResponse())
+        try
+        {
+            final List<Capability> matchedCapabilities = fruService.findMatchingCapabilities(requiredCapability);
+            if (matchedCapabilities.isEmpty())
             {
-                for (final Capability capability : capabilityProvider.getCapabilities())
-                {
-                    LOG.debug("Found capability {}", capability.getProfile());
-
-                    if (requiredCapability.equals(capability.getProfile()))
-                    {
-                        LOG.debug("Found matching capability {}", capability.getProfile());
-                        final List<EndpointProperty> endpointProperties = capability.getProviderEndpoint().getEndpointProperties();
-                        final Map<String, String> amqpProperties = endpointProperties.stream()
-                                .collect(Collectors.toMap(EndpointProperty::getName, EndpointProperty::getValue));
-
-                        final String requestExchange = amqpProperties.get("request-exchange");
-                        final String requestRoutingKey = amqpProperties.get("request-routing-key");
-
-                        final TopicExchange responseExchange = new TopicExchange(amqpProperties.get("response-exchange"));
-                        final String responseRoutingKey = amqpProperties.get("response-routing-key").replace("{replyTo}", "." + replyTo);
-
-                        amqpAdmin.declareBinding(BindingBuilder.bind(responseQueue).to(responseExchange).with(responseRoutingKey));
-
-                        LOG.debug("Adding binding {} {}", responseExchange.getName(), responseRoutingKey);
-
-                        final UUID correlationId = UUID.randomUUID();
-                        ListStorageRequestMessage requestMessage = new ListStorageRequestMessage();
-                        MessageProperties messageProperties = new MessageProperties();
-                        messageProperties.setCorrelationId((correlationId.toString()));
-                        messageProperties.setReplyTo(replyTo);
-                        messageProperties.setTimestamp(new Date());
-                        requestMessage.setMessageProperties(messageProperties);
-
-                        try
-                        {
-                            new URL(scaleIOCredentials.getEndpointUrl());
-                        }
-                        catch (MalformedURLException e)
-                        {
-                            final CompletableFuture<ScaleIOSystemDataRestRep> promise = new CompletableFuture<>();
-                            promise.completeExceptionally(e);
-                            return promise;
-                        }
-                        requestMessage.setEndpointURL(scaleIOCredentials.getEndpointUrl());
-                        requestMessage.setPassword(scaleIOCredentials.getPassword());
-                        requestMessage.setUserName(scaleIOCredentials.getUsername());
-
-                        final CompletableFuture<ScaleIOSystemDataRestRep> promise = asyncAcknowledgement.register(correlationId.toString());
-
-                        rabbitTemplate.convertAndSend(requestExchange, requestRoutingKey, requestMessage);
-
-                        return promise;
-                    }
-                }
+                LOG.info("No matching capability found for capability [{}]", requiredCapability);
+                return CompletableFuture.completedFuture(null);
             }
-        }
-        catch (CapabilityRegistryException e)
-        {
-            LOG.error("Failed while looking up Capability Registry for {}", requiredCapability, e);
-        }
-        catch (ServiceTimeoutException e)
-        {
-            LOG.error("Service timed out while querying Capability Registry");
-        }
-        LOG.error("Unable to find required capability: {}", requiredCapability);
-        return CompletableFuture.completedFuture(null);
 
+            final Capability matchedCapability = matchedCapabilities.stream().findFirst().get();
+            LOG.debug("Found capability {}", matchedCapability.getProfile());
+
+            final Map<String, String> amqpProperties = fruService.declareBinding(matchedCapability, replyTo);
+
+            final String correlationId = UUID.randomUUID().toString();
+            final ListStorageRequestMessage requestMessage = new ListStorageRequestMessage();
+            requestMessage.setEndpointURL(scaleIOCredentials.getEndpointUrl());
+            requestMessage.setUserName(scaleIOCredentials.getUsername());
+            requestMessage.setPassword(scaleIOCredentials.getPassword());
+            requestMessage.setMessageProperties(new MessageProperties(new Date(), correlationId, replyTo));
+            return fruService.registerPromiseAndSendRequestMessage(asyncAcknowledgement, correlationId, requestMessage, amqpProperties);
+        }
+        catch (CapabilityRegistryException | ServiceTimeoutException e)
+        {
+            return CompletableFuture.completedFuture(null);
+        }
     }
 
     public CompletableFuture<ConsulRegistryResult> requestConsulRegistration(final EndpointCredentials scaleIOCredentials)
     {
         final String requiredCapability = "coprhd-consul-register";
+
         try
         {
-            final ListCapabilityProvidersResponse listCapabilityProvidersResponse = capabilityRegistryLookupManager
-                    .listCapabilityProviders(TimeUnit.SECONDS.toMillis(5));
+            new URL(scaleIOCredentials.getEndpointUrl());
+        }
+        catch (MalformedURLException e)
+        {
+            final CompletableFuture<ConsulRegistryResult> promise = new CompletableFuture<>();
+            return fruService.malformedUrlException(e, promise);
+        }
 
-            for (final CapabilityProvider capabilityProvider : listCapabilityProvidersResponse.getResponse())
+        try
+        {
+            final List<Capability> matchedCapabilities = fruService.findMatchingCapabilities(requiredCapability);
+            if (matchedCapabilities.isEmpty())
             {
-                for (final Capability capability : capabilityProvider.getCapabilities())
-                {
-                    LOG.debug("Found capability {}", capability.getProfile());
-
-                    if (requiredCapability.equals(capability.getProfile()))
-                    {
-                        LOG.debug("Found matching capability {}", capability.getProfile());
-                        final List<EndpointProperty> endpointProperties = capability.getProviderEndpoint().getEndpointProperties();
-                        final Map<String, String> amqpProperties = endpointProperties.stream()
-                                .collect(Collectors.toMap(EndpointProperty::getName, EndpointProperty::getValue));
-
-                        final String requestExchange = amqpProperties.get("request-exchange");
-                        final String requestRoutingKey = amqpProperties.get("request-routing-key");
-
-                        final TopicExchange responseExchange = new TopicExchange(amqpProperties.get("response-exchange"));
-                        final String responseRoutingKey = amqpProperties.get("response-routing-key").replace("{replyTo}", "." + replyTo);
-
-                        amqpAdmin.declareBinding(BindingBuilder.bind(responseQueue).to(responseExchange).with(responseRoutingKey));
-
-                        LOG.debug("Adding binding {} {}", responseExchange.getName(), responseRoutingKey);
-
-                        final UUID correlationId = UUID.randomUUID();
-                        ConsulRegisterRequestMessage requestMessage = new ConsulRegisterRequestMessage();
-                        requestMessage.setMessageProperties(
-                                new com.dell.cpsd.storage.capabilities.api.MessageProperties().withCorrelationId(correlationId.toString())
-                                        .withReplyTo(replyTo).withTimestamp(new Date()));
-
-                        try
-                        {
-                            new URL(scaleIOCredentials.getEndpointUrl());
-                        }
-                        catch (MalformedURLException e)
-                        {
-                            final CompletableFuture<ConsulRegistryResult> promise = new CompletableFuture<>();
-                            promise.completeExceptionally(e);
-                            return promise;
-                        }
-                        final RegistrationInfo registrationInfo = new RegistrationInfo(scaleIOCredentials.getEndpointUrl(),
-                                scaleIOCredentials.getPassword(), scaleIOCredentials.getUsername());
-                        requestMessage.setRegistrationInfo(registrationInfo);
-
-                        final CompletableFuture<ConsulRegistryResult> promise = consulRegisterAsyncAcknowledgement
-                                .register(correlationId.toString());
-
-                        rabbitTemplate.convertAndSend(requestExchange, requestRoutingKey, requestMessage);
-
-                        return promise;
-                    }
-                }
+                LOG.info("No matching capability found for capability [{}]", requiredCapability);
+                return CompletableFuture.completedFuture(null);
             }
-        }
-        catch (CapabilityRegistryException e)
-        {
-            LOG.error("Failed while looking up Capability Registry for {}", requiredCapability, e);
-        }
-        catch (ServiceTimeoutException e)
-        {
-            LOG.error("Service timed out while querying Capability Registry");
-        }
-        LOG.error("Unable to find required capability: {}", requiredCapability);
-        return CompletableFuture.completedFuture(null);
 
+            final Capability matchedCapability = matchedCapabilities.stream().findFirst().get();
+            LOG.debug("Found capability {}", matchedCapability.getProfile());
+
+            final Map<String, String> amqpProperties = fruService.declareBinding(matchedCapability, replyTo);
+
+            final String correlationId = UUID.randomUUID().toString();
+            final ConsulRegisterRequestMessage requestMessage = new ConsulRegisterRequestMessage();
+            final RegistrationInfo registrationInfo = new RegistrationInfo(scaleIOCredentials.getEndpointUrl(),
+                    scaleIOCredentials.getPassword(), scaleIOCredentials.getUsername());
+            requestMessage.setRegistrationInfo(registrationInfo);
+            requestMessage.setMessageProperties(new MessageProperties(new Date(), correlationId, replyTo));
+            return fruService.registerPromiseAndSendRequestMessage(consulRegisterAsyncAcknowledgement, correlationId, requestMessage,
+                    amqpProperties);
+        }
+        catch (CapabilityRegistryException | ServiceTimeoutException e)
+        {
+            return CompletableFuture.completedFuture(null);
+        }
     }
 }
