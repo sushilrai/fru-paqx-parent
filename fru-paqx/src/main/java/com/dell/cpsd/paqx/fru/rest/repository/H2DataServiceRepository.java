@@ -8,6 +8,7 @@ package com.dell.cpsd.paqx.fru.rest.repository;
 import com.dell.cpsd.paqx.fru.domain.Datacenter;
 import com.dell.cpsd.paqx.fru.domain.FruJob;
 import com.dell.cpsd.paqx.fru.domain.ScaleIOData;
+import com.dell.cpsd.paqx.fru.domain.VCenter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -63,7 +64,7 @@ public class H2DataServiceRepository implements DataServiceRepository
 
     @Override
     @Transactional
-    public Long saveVCenterData(final UUID jobId, final Datacenter data)
+    public Long saveVCenterData(final UUID jobId, final VCenter data)
     {
         TypedQuery<FruJob> query = entityManager.createQuery("from FruJob where JOB_ID = :jobid", FruJob.class);
 

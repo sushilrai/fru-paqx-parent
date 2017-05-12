@@ -34,9 +34,9 @@ public class FruJob
     private ScaleIOData scaleIOData;
 
     @OneToOne(cascade = CascadeType.ALL)
-    private Datacenter vcenter;
+    private VCenter vcenter;
 
-    public FruJob(final String id, final ScaleIOData scaleIO, final Datacenter vcenter)
+    public FruJob(final String id, final ScaleIOData scaleIO, final VCenter vcenter)
     {
         this.id = id;
         this.scaleIOData = scaleIO;
@@ -68,12 +68,12 @@ public class FruJob
         this.scaleIOData = scaleIO;
     }
 
-    public Datacenter getVcenter()
+    public VCenter getVcenter()
     {
         return vcenter;
     }
 
-    public void setVcenter(final Datacenter vcenter)
+    public void setVcenter(final VCenter vcenter)
     {
         this.vcenter = vcenter;
     }

@@ -12,6 +12,9 @@ public class DVPortGroup {
     @Column(name = "UUID", unique = true, nullable = false)
     private Long uuid;
 
+    @Column(name = "DV_PORTGROUP_ID", unique=true, nullable=false)
+    private String id;
+
     @Column(name = "NAME")
     private String name;
 
@@ -21,7 +24,11 @@ public class DVPortGroup {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "dvPortGroup")
     private List<VirtualNicDVPortGroup> virtualNicDVPortGroups;
 
-    public DVPortGroup(String name) {
+    public DVPortGroup() {
+    }
+
+    public DVPortGroup(String id, String name) {
+        this.id = id;
         this.name = name;
     }
 
@@ -33,11 +40,27 @@ public class DVPortGroup {
         this.name = name;
     }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
     public List<VMNetwork> getVmNetworkList() {
         return vmNetworkList;
     }
 
     public void setVmNetworkList(List<VMNetwork> vmNetworkList) {
         this.vmNetworkList = vmNetworkList;
+    }
+
+    public List<VirtualNicDVPortGroup> getVirtualNicDVPortGroups() {
+        return virtualNicDVPortGroups;
+    }
+
+    public void setVirtualNicDVPortGroups(List<VirtualNicDVPortGroup> virtualNicDVPortGroups) {
+        this.virtualNicDVPortGroups = virtualNicDVPortGroups;
     }
 }

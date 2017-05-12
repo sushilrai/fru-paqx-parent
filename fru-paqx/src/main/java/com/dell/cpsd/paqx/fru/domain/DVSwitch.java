@@ -1,6 +1,8 @@
 package com.dell.cpsd.paqx.fru.domain;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "DVSWITCH")
@@ -25,13 +27,11 @@ public class DVSwitch {
         this.allowPromiscuous = allowPromiscuous;
     }
 
-    // DVSwitch maps back to one datacenter
     @ManyToOne(cascade = CascadeType.ALL)
     private Datacenter datacenter;
 
-    // DVSwitch can have several networks
-//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dVSwitch", orphanRemoval = true)
-//    private List<Network> networkList = new ArrayList<>();
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "dvSwitch", orphanRemoval = true)
+    List<PhysicalNicDVSConnection> physicalNicDVSConnectionList = new ArrayList<>();
 
     public Long getUuid() {
         return uuid;
@@ -73,14 +73,11 @@ public class DVSwitch {
         this.datacenter = datacenter;
     }
 
-//    public List<Network> getNetworkList() {
-//        return networkList;
-//    }
-//    public void addNetwork(Network network) {
-//        this.networkList.add(network);
-//    }
-//
-//    public void setNetworkList(List<Network> networkList) {
-//        this.networkList = networkList;
-//    }
+    public List<PhysicalNicDVSConnection> getPhysicalNicDVSConnectionList() {
+        return physicalNicDVSConnectionList;
+    }
+
+    public void setPhysicalNicDVSConnectionList(List<PhysicalNicDVSConnection> physicalNicDVSConnectionList) {
+        this.physicalNicDVSConnectionList = physicalNicDVSConnectionList;
+    }
 }

@@ -4,8 +4,8 @@
  */
 package com.dell.cpsd.paqx.fru.rest.repository;
 
-import com.dell.cpsd.paqx.fru.domain.Datacenter;
 import com.dell.cpsd.paqx.fru.domain.ScaleIOData;
+import com.dell.cpsd.paqx.fru.domain.VCenter;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
@@ -20,5 +20,5 @@ public interface DataServiceRepository
     Long saveScaleIOData(UUID jobId, ScaleIOData data);
 
     @Transactional
-    Long saveVCenterData(UUID jobId, Datacenter data);
+    Long saveVCenterData(UUID jobId, VCenter data);
 }
