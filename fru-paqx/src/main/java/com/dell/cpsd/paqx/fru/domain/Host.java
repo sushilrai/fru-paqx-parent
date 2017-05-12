@@ -30,6 +30,12 @@ public class Host {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "host", orphanRemoval = true)
     List<VirtualNic> virtualNicList = new ArrayList<>();
 
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "host", orphanRemoval = true)
+    private HostIpRouteConfig hostIpRouteConfig;
+
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "host", orphanRemoval = true)
+    private HostDnsConfig hostDnsConfig;
+
     public Host(String id, String name, String powerState) {
         this.id = id;
         this.name = name;
@@ -84,11 +90,35 @@ public class Host {
         this.vSwitchList.add(vSwitch);
     }
 
+    public void setvSwitchList(List<VSwitch> vSwitchList) {
+        this.vSwitchList = vSwitchList;
+    }
+
     public List<VirtualNic> getVirtualNicList() {
         return virtualNicList;
     }
 
     public void addVirtualNic(VirtualNic virtualNic) {
         this.virtualNicList.add(virtualNic);
+    }
+
+    public void setVirtualNicList(List<VirtualNic> virtualNicList) {
+        this.virtualNicList = virtualNicList;
+    }
+
+    public HostIpRouteConfig getHostIpRouteConfig() {
+        return hostIpRouteConfig;
+    }
+
+    public void setHostIpRouteConfig(HostIpRouteConfig hostIpRouteConfig) {
+        this.hostIpRouteConfig = hostIpRouteConfig;
+    }
+
+    public HostDnsConfig getHostDnsConfig() {
+        return hostDnsConfig;
+    }
+
+    public void setHostDnsConfig(HostDnsConfig hostDnsConfig) {
+        this.hostDnsConfig = hostDnsConfig;
     }
 }
