@@ -4,9 +4,6 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by britney2k on 5/9/17.
- */
 @Entity
 @Table(name = "CLUSTER")
 public class Cluster {

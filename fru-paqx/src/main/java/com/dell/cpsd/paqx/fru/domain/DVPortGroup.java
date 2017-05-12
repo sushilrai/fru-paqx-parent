@@ -8,7 +8,7 @@ import java.util.List;
 @Table(name = "DV_PORTGROUP")
 public class DVPortGroup {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "UUID", unique = true, nullable = false)
     private Long uuid;
 

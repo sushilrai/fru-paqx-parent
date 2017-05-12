@@ -6,7 +6,7 @@ import javax.persistence.*;
 @Table(name = "VM_IP")
 public class VMIP {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "UUID", unique = true, nullable = false)
     private Long uuid;
 

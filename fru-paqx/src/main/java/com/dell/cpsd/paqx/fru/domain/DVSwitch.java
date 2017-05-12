@@ -2,14 +2,11 @@ package com.dell.cpsd.paqx.fru.domain;
 
 import javax.persistence.*;
 
-/**
- * Created by britney2k on 5/9/17.
- */
 @Entity
 @Table(name = "DVSWITCH")
 public class DVSwitch {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "UUID", unique = true, nullable = false)
     private Long uuid;
 

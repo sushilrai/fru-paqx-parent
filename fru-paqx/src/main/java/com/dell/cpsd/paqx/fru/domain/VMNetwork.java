@@ -4,14 +4,11 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by britney2k on 5/10/17.
- */
 @Entity
 @Table(name = "VM_GUEST_NETWORK")
 public class VMNetwork {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "UUID", unique = true, nullable = false)
     private Long uuid;
 

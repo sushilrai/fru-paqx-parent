@@ -2,14 +2,11 @@ package com.dell.cpsd.paqx.fru.domain;
 
 import javax.persistence.*;
 
-/**
- * Created by britney2k on 5/10/17.
- */
 @Entity
 @Table(name = "NETWORK")
 public class Network {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "UUID", unique = true, nullable = false)
     private Long uuid;
 

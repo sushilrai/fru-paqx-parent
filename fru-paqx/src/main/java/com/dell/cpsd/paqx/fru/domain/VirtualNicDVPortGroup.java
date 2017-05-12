@@ -6,7 +6,7 @@ import javax.persistence.*;
 @Table(name = "VIRTUAL_NIC_DV_PORTGROUP")
 public class VirtualNicDVPortGroup {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "UUID", unique = true, nullable = false)
     private Long uuid;
 
