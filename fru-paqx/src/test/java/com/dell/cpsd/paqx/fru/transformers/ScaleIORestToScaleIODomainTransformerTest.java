@@ -1,3 +1,8 @@
+/**
+ * Copyright &copy; 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
+ * Dell EMC Confidential/Proprietary Information
+ */
+
 package com.dell.cpsd.paqx.fru.transformers;
 
 import com.dell.cpsd.paqx.fru.domain.ScaleIOData;
@@ -9,7 +14,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Created by kenefj on 11/05/2017.
+ * Copyright &copy; 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
+ * Dell EMC Confidential/Proprietary Information
  */
 public class ScaleIORestToScaleIODomainTransformerTest
 {
@@ -25,7 +31,7 @@ public class ScaleIORestToScaleIODomainTransformerTest
     {
         ScaleIORestToScaleIODomainTransformer transformer = new ScaleIORestToScaleIODomainTransformer();
         ScaleIOSystemDataRestRep rep = new ScaleIOSystemDataRestRep();
-        assertTrue(transformer.transform(rep)!=null);
+        assertTrue(transformer.transform(rep) != null);
     }
 
     @Test
@@ -50,8 +56,8 @@ public class ScaleIORestToScaleIODomainTransformerTest
         rep.setSystemVersionName("systemversionname1");
         rep.setVersion("version1");
 
-        ScaleIOData data=transformer.transform(rep);
-        assertTrue( data!= null);
+        ScaleIOData data = transformer.transform(rep);
+        assertTrue(data != null);
         assertTrue(data.getId().equals("id1"));
         assertTrue(data.getInstallId().equals("installid1"));
         assertTrue(data.getMdmClusterState().equals("mdmClusterState1"));

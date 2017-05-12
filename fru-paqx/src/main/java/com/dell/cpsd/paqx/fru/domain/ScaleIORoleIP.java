@@ -1,3 +1,8 @@
+/**
+ * Copyright &copy; 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
+ * Dell EMC Confidential/Proprietary Information
+ */
+
 package com.dell.cpsd.paqx.fru.domain;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -13,10 +18,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
- * Created by kenefj on 03/05/17.
+ * Copyright &copy; 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
+ * Dell EMC Confidential/Proprietary Information
  */
 @Entity
-@Table(name="SCALEIO_IP_LIST")
+@Table(name = "SCALEIO_IP_LIST")
 public class ScaleIORoleIP
 {
     @Id
@@ -30,13 +36,13 @@ public class ScaleIORoleIP
     @Column(name = "SDS_IP")
     private String ip;
 
-    @ManyToOne(cascade= CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     private ScaleIOSDS sds;
 
     public ScaleIORoleIP(final String role, final String ip)
     {
-        this.role=role;
-        this.ip=ip;
+        this.role = role;
+        this.ip = ip;
     }
 
     public Long getUuid()
@@ -75,7 +81,8 @@ public class ScaleIORoleIP
     }
 
     @Override
-    public int hashCode() {
+    public int hashCode()
+    {
         return new HashCodeBuilder().append(uuid).append(role).append(ip).toHashCode();
     }
 
@@ -88,11 +95,14 @@ public class ScaleIORoleIP
      * @return true if their attributes are equal
      */
     @Override
-    public boolean equals(Object other) {
-        if (other == this) {
+    public boolean equals(Object other)
+    {
+        if (other == this)
+        {
             return true;
         }
-        if (!(other instanceof ScaleIORoleIP)) {
+        if (!(other instanceof ScaleIORoleIP))
+        {
             return false;
         }
         //Toot stands for "That Object Over There"

@@ -1,3 +1,8 @@
+/**
+ * Copyright &copy; 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
+ * Dell EMC Confidential/Proprietary Information
+ */
+
 package com.dell.cpsd.paqx.fru.domain;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -16,11 +21,12 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 /**
- * Created by kenefj on 03/05/17.
+ * Copyright &copy; 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
+ * Dell EMC Confidential/Proprietary Information
  */
 @Entity
-@Inheritance(strategy= InheritanceType.SINGLE_TABLE)
-@Table(name="SCALEIO_IP")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Table(name = "SCALEIO_IP")
 @DiscriminatorColumn(name = "SCALEIO_IP_TYPE")
 public abstract class ScaleIOIP
 {
@@ -38,7 +44,7 @@ public abstract class ScaleIOIP
     @ManyToOne(cascade = CascadeType.ALL)
     public ScaleIOData scaleIOData;
 
-    @ManyToOne(cascade=CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     public ScaleIOSDSElementInfo sdsElementInfo;
 
     public ScaleIOIP(final String id, final String ip)
@@ -88,7 +94,8 @@ public abstract class ScaleIOIP
     }
 
     @Override
-    public int hashCode() {
+    public int hashCode()
+    {
         return new HashCodeBuilder().append(uuid).append(id).append(ip).toHashCode();
     }
 
@@ -101,11 +108,14 @@ public abstract class ScaleIOIP
      * @return true if their attributes are equal
      */
     @Override
-    public boolean equals(Object other) {
-        if (other == this) {
+    public boolean equals(Object other)
+    {
+        if (other == this)
+        {
             return true;
         }
-        if (!(other instanceof ScaleIOIP)) {
+        if (!(other instanceof ScaleIOIP))
+        {
             return false;
         }
         //Toot stands for "That Object Over There"

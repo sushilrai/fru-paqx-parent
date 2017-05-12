@@ -1,3 +1,7 @@
+/**
+ * Copyright &copy; 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
+ * Dell EMC Confidential/Proprietary Information
+ */
 package com.dell.cpsd.paqx.fru.transformers;
 
 import com.dell.cpsd.paqx.fru.domain.ScaleIOData;
@@ -36,7 +40,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Created by kenefj on 10/05/2017.
+ * Copyright &copy; 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
+ * Dell EMC Confidential/Proprietary Information
  */
 public class ScaleIORestToScaleIODomainTransformer
 {

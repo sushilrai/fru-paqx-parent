@@ -1,3 +1,8 @@
+/**
+ * Copyright &copy; 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
+ * Dell EMC Confidential/Proprietary Information
+ */
+
 package com.dell.cpsd.paqx.fru.domain;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -16,10 +21,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by kenefj on 03/05/17.
+ * Copyright &copy; 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
+ * Dell EMC Confidential/Proprietary Information
  */
 @Entity
-@Table(name="SCALEIO_STORAGE_POOL")
+@Table(name = "SCALEIO_STORAGE_POOL")
 public class ScaleIOStoragePool
 {
     @Id
@@ -46,14 +52,14 @@ public class ScaleIOStoragePool
     private ScaleIOProtectionDomain protectionDomain;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "storagePool", orphanRemoval = true)
-    private List<ScaleIODevice>     devices = new ArrayList<>();
+    private List<ScaleIODevice> devices = new ArrayList<>();
 
     public ScaleIOStoragePool(final String id, final String storagePoolName, final int capacityAvailableForVolumeAllocationInKb,
             final int maxCapacityInKb, final int numOfVolumes)
     {
         this.id = id;
         this.name = storagePoolName;
-        this. capacityAvailableForVolumeAllocationInKb = capacityAvailableForVolumeAllocationInKb;
+        this.capacityAvailableForVolumeAllocationInKb = capacityAvailableForVolumeAllocationInKb;
         this.maxCapacityInKb = maxCapacityInKb;
         this.numOfVolumes = numOfVolumes;
     }
@@ -74,7 +80,8 @@ public class ScaleIOStoragePool
     }
 
     @Override
-    public int hashCode() {
+    public int hashCode()
+    {
         return new HashCodeBuilder().append(uuid).append(id).append(name).append(capacityAvailableForVolumeAllocationInKb)
                 .append(maxCapacityInKb).append(numOfVolumes).append(devices).toHashCode();
     }
@@ -83,7 +90,7 @@ public class ScaleIOStoragePool
      * For the sake of non-circular checks "equals" checks for relationship attributes must be checked
      * on only one side of the relationship. In the case of OneToMany relationships it will be done on
      * the "One" side (the one holding the List)
-     *
+     * <p>
      * On the "Many" Side we'll ignore the attribute when doing the equals comparison as a way to avoid
      * a circular reference starting and endless cycle.
      *
@@ -91,18 +98,21 @@ public class ScaleIOStoragePool
      * @return true if their attributes are equal
      */
     @Override
-    public boolean equals(Object other) {
-        if (other == this) {
+    public boolean equals(Object other)
+    {
+        if (other == this)
+        {
             return true;
         }
-        if (!(other instanceof ScaleIOStoragePool)) {
+        if (!(other instanceof ScaleIOStoragePool))
+        {
             return false;
         }
         //Toot stands for "That Object Over There"
         ScaleIOStoragePool toot = ((ScaleIOStoragePool) other);
         return new EqualsBuilder().append(uuid, toot.uuid).append(id, toot.id).append(name, toot.name)
                 .append(capacityAvailableForVolumeAllocationInKb, toot.capacityAvailableForVolumeAllocationInKb)
-                .append(maxCapacityInKb, toot.maxCapacityInKb).append(numOfVolumes, toot.numOfVolumes)
-                .append(devices, toot.devices).isEquals();
+                .append(maxCapacityInKb, toot.maxCapacityInKb).append(numOfVolumes, toot.numOfVolumes).append(devices, toot.devices)
+                .isEquals();
     }
 }

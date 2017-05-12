@@ -1,3 +1,7 @@
+/**
+ * Copyright &copy; 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
+ * Dell EMC Confidential/Proprietary Information
+ */
 package com.dell.cpsd.paqx.fru.domain;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -7,19 +11,20 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 
 /**
- * Created by kenefj on 03/05/17.
+ * Copyright &copy; 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
+ * Dell EMC Confidential/Proprietary Information
  */
 @Entity
 public abstract class ScaleIOSDSStatusElementInfo extends ScaleIOSDSElementInfo
 {
-    @Column(name="SDS_ELEMENT_STATUS")
+    @Column(name = "SDS_ELEMENT_STATUS")
     private String status;
 
     public ScaleIOSDSStatusElementInfo(final String id9, final int i, final String version1, final String slave, final String s,
             final String s1)
     {
-        super(id9, i, version1, slave,s);
-        this.status=s1;
+        super(id9, i, version1, slave, s);
+        this.status = s1;
     }
 
     public String getStatus()
@@ -33,7 +38,8 @@ public abstract class ScaleIOSDSStatusElementInfo extends ScaleIOSDSElementInfo
     }
 
     @Override
-    public int hashCode() {
+    public int hashCode()
+    {
         return new HashCodeBuilder().append(status).toHashCode();
     }
 
@@ -46,11 +52,14 @@ public abstract class ScaleIOSDSStatusElementInfo extends ScaleIOSDSElementInfo
      * @return true if their attributes are equal
      */
     @Override
-    public boolean equals(Object other) {
-        if (other == this) {
+    public boolean equals(Object other)
+    {
+        if (other == this)
+        {
             return true;
         }
-        if (!(other instanceof ScaleIOSDSStatusElementInfo)) {
+        if (!(other instanceof ScaleIOSDSStatusElementInfo))
+        {
             return false;
         }
         //Toot stands for "That Object Over There"

@@ -1,3 +1,7 @@
+/**
+ * Copyright &copy; 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
+ * Dell EMC Confidential/Proprietary Information
+ */
 package com.dell.cpsd.paqx.fru.domain;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -16,10 +20,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by kenefj on 03/05/17.
+ * Copyright &copy; 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
+ * Dell EMC Confidential/Proprietary Information
  */
 @Entity
-@Table(name="SCALE_IO_PROTETION_DOMAIN")
+@Table(name = "SCALE_IO_PROTETION_DOMAIN")
 public class ScaleIOProtectionDomain
 {
     @Id
@@ -34,7 +39,7 @@ public class ScaleIOProtectionDomain
     private String name;
 
     @Column(name = "PROTECTION_DOMAIN_STATE")
-    private String                protectionDomainState;
+    private String protectionDomainState;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "protectionDomain", orphanRemoval = true)
     private List<ScaleIOFaultSet> faultSets = new ArrayList<>();
@@ -45,14 +50,14 @@ public class ScaleIOProtectionDomain
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "protectionDomain", orphanRemoval = true)
     private List<ScaleIOStoragePool> storagePools = new ArrayList<>();
 
-    @ManyToOne(cascade=CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.ALL)
     private ScaleIOData scaleIOData;
 
     public ScaleIOProtectionDomain(final String id, final String protectionDomainName, final String state)
     {
-        this.id=id;
-        this.name=protectionDomainName;
-        this.protectionDomainState=state;
+        this.id = id;
+        this.name = protectionDomainName;
+        this.protectionDomainState = state;
     }
 
     public Long getUuid()
@@ -121,16 +126,17 @@ public class ScaleIOProtectionDomain
     }
 
     @Override
-    public int hashCode() {
-        return new HashCodeBuilder().append(uuid).append(id).append(name).append(protectionDomainState)
-                .append(faultSets).append(sdsList).append(storagePools).toHashCode();
+    public int hashCode()
+    {
+        return new HashCodeBuilder().append(uuid).append(id).append(name).append(protectionDomainState).append(faultSets).append(sdsList)
+                .append(storagePools).toHashCode();
     }
 
     /**
      * For the sake of non-circular checks "equals" checks for relationship attributes must be checked
      * on only one side of the relationship. In the case of OneToMany relationships it will be done on
      * the "One" side (the one holding the List)
-     *
+     * <p>
      * On the "Many" Side we'll ignore the attribute when doing the equals comparison as a way to avoid
      * a circular reference starting and endless cycle.
      *
@@ -138,17 +144,20 @@ public class ScaleIOProtectionDomain
      * @return true if their attributes are equal
      */
     @Override
-    public boolean equals(Object other) {
-        if (other == this) {
+    public boolean equals(Object other)
+    {
+        if (other == this)
+        {
             return true;
         }
-        if (!(other instanceof ScaleIOProtectionDomain)) {
+        if (!(other instanceof ScaleIOProtectionDomain))
+        {
             return false;
         }
         //Toot stands for "That Object Over There"
         ScaleIOProtectionDomain toot = ((ScaleIOProtectionDomain) other);
         return new EqualsBuilder().append(uuid, toot.uuid).append(id, toot.id).append(name, toot.name)
-                .append(protectionDomainState, toot.protectionDomainState).append(faultSets, toot.faultSets)
-                .append(sdsList, toot.sdsList).append(storagePools, toot.storagePools).isEquals();
+                .append(protectionDomainState, toot.protectionDomainState).append(faultSets, toot.faultSets).append(sdsList, toot.sdsList)
+                .append(storagePools, toot.storagePools).isEquals();
     }
 }

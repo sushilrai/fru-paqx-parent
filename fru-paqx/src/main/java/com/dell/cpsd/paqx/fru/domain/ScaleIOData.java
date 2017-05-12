@@ -1,3 +1,8 @@
+/**
+ * Copyright &copy; 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
+ * Dell EMC Confidential/Proprietary Information
+ */
+
 package com.dell.cpsd.paqx.fru.domain;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -16,7 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by kenefj on 03/05/17.
+ * Copyright &copy; 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
+ * Dell EMC Confidential/Proprietary Information
  */
 @Entity
 @Table(name = "SCALEIO_DATA")
@@ -27,7 +33,7 @@ public class ScaleIOData
     @Column(name = "SCALEIO_UUID", unique = true, nullable = false)
     private Long uuid;
 
-    @Column(name = "SCALEIO_ID", unique = true, nullable = false)
+    @Column(name = "SCALEIO_ID", unique = true)
     private String id;
 
     @Column(name = "SCALEIO_NAME")
@@ -48,7 +54,10 @@ public class ScaleIOData
     @Column(name = "SCALEIO_VERSION")
     private String version;
 
-    @OneToOne(cascade = CascadeType.ALL, optional = false)
+    @OneToOne(optional = false, mappedBy = "scaleIOData", cascade = CascadeType.ALL)
+    private FruJob job;
+
+    @OneToOne(cascade = CascadeType.ALL)
     private ScaleIOMdmCluster mdmCluster = null;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "scaleIOData", orphanRemoval = true)
@@ -227,21 +236,21 @@ public class ScaleIOData
     }
 
     @Override
-    public int hashCode() {
-        return new HashCodeBuilder().append(uuid).append(id).append(name).append(installId)
-                .append(mdmMode).append(systemVersionName).append(mdmClusterState).append(version)
-                .append(sdcList).append(sdsList).append(tiebreakerScaleIOList).append(primaryMDMIPList)
-                .append(secondaryMDMIPList).append(protectionDomains).toHashCode();
+    public int hashCode()
+    {
+        return new HashCodeBuilder().append(uuid).append(id).append(name).append(installId).append(mdmMode).append(systemVersionName)
+                .append(mdmClusterState).append(version).append(sdcList).append(sdsList).append(tiebreakerScaleIOList)
+                .append(primaryMDMIPList).append(secondaryMDMIPList).append(protectionDomains).toHashCode();
     }
 
     /**
      * For the sake of non-circular checks "equals" checks for relationship attributes must be checked
      * on only one side of the relationship. In the case of OneToMany relationships it will be done on
      * the "One" side (the one holding the List)
-     *
+     * <p>
      * On the "Many" Side we'll ignore the attribute when doing the equals comparison as a way to avoid
      * a circular reference starting and endless cycle.
-     *
+     * <p>
      * In the case of OneToOne relationships, one of the sides have to be chosen. For the case of Clusters
      * and Systems the representative side chosen will be the MDM Cluster Side, therefore the equals comparison
      * shall be made on that side and we will ignore the attribute on this side.
@@ -250,21 +259,24 @@ public class ScaleIOData
      * @return true if their attributes are equal
      */
     @Override
-    public boolean equals(Object other) {
-        if (other == this) {
+    public boolean equals(Object other)
+    {
+        if (other == this)
+        {
             return true;
         }
-        if (!(other instanceof ScaleIOData)) {
+        if (!(other instanceof ScaleIOData))
+        {
             return false;
         }
 
         //Toot stands for "That Object Over There"
         ScaleIOData toot = ((ScaleIOData) other);
 
-        return new EqualsBuilder().append(uuid, toot.uuid).append(id, toot.id).append(name, toot.name)
-                .append(installId, toot.installId).append(mdmMode, toot.mdmMode).append(systemVersionName, toot.systemVersionName)
-                .append(mdmClusterState, toot.mdmClusterState).append(version, toot.version)
-                .append(sdcList, toot.sdcList).append(sdsList, toot.sdsList).append(tiebreakerScaleIOList, toot.tiebreakerScaleIOList)
+        return new EqualsBuilder().append(uuid, toot.uuid).append(id, toot.id).append(name, toot.name).append(installId, toot.installId)
+                .append(mdmMode, toot.mdmMode).append(systemVersionName, toot.systemVersionName)
+                .append(mdmClusterState, toot.mdmClusterState).append(version, toot.version).append(sdcList, toot.sdcList)
+                .append(sdsList, toot.sdsList).append(tiebreakerScaleIOList, toot.tiebreakerScaleIOList)
                 .append(primaryMDMIPList, toot.primaryMDMIPList).append(secondaryMDMIPList, toot.secondaryMDMIPList)
                 .append(protectionDomains, toot.protectionDomains).isEquals();
     }

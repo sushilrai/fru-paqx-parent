@@ -1,3 +1,7 @@
+/**
+ * Copyright &copy; 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
+ * Dell EMC Confidential/Proprietary Information
+ */
 package com.dell.cpsd.paqx.fru.domain;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -16,7 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by kenefj on 03/05/17.
+ * Copyright &copy; 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
+ * Dell EMC Confidential/Proprietary Information
  */
 @Entity
 @Table(name = "SCALEIO_MDM_CLUSTER")
@@ -45,7 +50,7 @@ public class ScaleIOMdmCluster
     @Column(name = "MDM_CLUSTER_GOOD_REPLICAS_NUM")
     private Integer goodReplicasNum;
 
-    @OneToOne(optional=false, mappedBy="mdmCluster", cascade=CascadeType.ALL)
+    @OneToOne(optional = false, mappedBy = "mdmCluster", cascade = CascadeType.ALL)
     private ScaleIOData scaleIOData;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "mdmCluster", orphanRemoval = true)
@@ -60,12 +65,12 @@ public class ScaleIOMdmCluster
     public ScaleIOMdmCluster(final String id8, final String clusterName, final String clusterState, final String clusterMode, final int i,
             final int i1)
     {
-        this.id=id8;
-        this.name=clusterName;
-        this.clusterState=clusterState;
-        this.clusterMode=clusterMode;
-        this.goodNodesNum=i;
-        this.goodReplicasNum=i1;
+        this.id = id8;
+        this.name = clusterName;
+        this.clusterState = clusterState;
+        this.clusterMode = clusterMode;
+        this.goodNodesNum = i;
+        this.goodReplicasNum = i1;
     }
 
     public Long getUuid()
@@ -159,20 +164,21 @@ public class ScaleIOMdmCluster
     }
 
     @Override
-    public int hashCode() {
-        return new HashCodeBuilder().append(uuid).append(id).append(name).append(clusterState)
-                .append(clusterMode).append(goodNodesNum).append(goodReplicasNum).append(scaleIOData)
-                .append(slaveElementInfo).append(tiebreakerElementInfo).append(masterElementInfo).toHashCode();
+    public int hashCode()
+    {
+        return new HashCodeBuilder().append(uuid).append(id).append(name).append(clusterState).append(clusterMode).append(goodNodesNum)
+                .append(goodReplicasNum).append(scaleIOData).append(slaveElementInfo).append(tiebreakerElementInfo)
+                .append(masterElementInfo).toHashCode();
     }
 
     /**
      * For the sake of non-circular checks "equals" checks for relationship attributes must be checked
      * on only one side of the relationship. In the case of OneToMany relationships it will be done on
      * the "One" side (the one holding the List)
-     *
+     * <p>
      * On the "Many" Side we'll ignore the attribute when doing the equals comparison as a way to avoid
      * a circular reference starting and endless cycle.
-     *
+     * <p>
      * In the case of OneToOne relationships, one of the sides have to be chosen. For the case of Clusters
      * and Systems the representative side chosen will be the MDM Cluster Side, therefore the equals comparison
      * shall be made on this side.
@@ -181,20 +187,22 @@ public class ScaleIOMdmCluster
      * @return true if their attributes are equal
      */
     @Override
-    public boolean equals(Object other) {
-        if (other == this) {
+    public boolean equals(Object other)
+    {
+        if (other == this)
+        {
             return true;
         }
-        if (!(other instanceof ScaleIOMdmCluster)) {
+        if (!(other instanceof ScaleIOMdmCluster))
+        {
             return false;
         }
         //Toot stands for "That Object Over There"
         ScaleIOMdmCluster toot = ((ScaleIOMdmCluster) other);
         return new EqualsBuilder().append(uuid, toot.uuid).append(id, toot.id).append(name, toot.name)
-                .append(clusterState, toot.clusterState).append(clusterMode, toot.clusterMode)
-                .append(goodNodesNum, toot.goodNodesNum).append(goodReplicasNum, toot.goodReplicasNum)
-                .append(scaleIOData, toot.scaleIOData).append(slaveElementInfo, toot.slaveElementInfo)
-                .append(tiebreakerElementInfo, toot.tiebreakerElementInfo).append(masterElementInfo, toot.masterElementInfo)
-                .isEquals();
+                .append(clusterState, toot.clusterState).append(clusterMode, toot.clusterMode).append(goodNodesNum, toot.goodNodesNum)
+                .append(goodReplicasNum, toot.goodReplicasNum).append(scaleIOData, toot.scaleIOData)
+                .append(slaveElementInfo, toot.slaveElementInfo).append(tiebreakerElementInfo, toot.tiebreakerElementInfo)
+                .append(masterElementInfo, toot.masterElementInfo).isEquals();
     }
 }

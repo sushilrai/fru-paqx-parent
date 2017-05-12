@@ -1,3 +1,7 @@
+/**
+ * Copyright &copy; 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
+ * Dell EMC Confidential/Proprietary Information
+ */
 package com.dell.cpsd.paqx.fru.domain;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -19,7 +23,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by kenefj on 03/05/17.
+ * Copyright &copy; 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
+ * Dell EMC Confidential/Proprietary Information
  */
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -101,16 +106,17 @@ public abstract class ScaleIOSDSElementInfo
     }
 
     @Override
-    public int hashCode() {
-        return new HashCodeBuilder().append(uuid).append(id).append(port).append(versionInfo).append(name)
-                .append(role).append(managementIPs).append(ips).toHashCode();
+    public int hashCode()
+    {
+        return new HashCodeBuilder().append(uuid).append(id).append(port).append(versionInfo).append(name).append(role)
+                .append(managementIPs).append(ips).toHashCode();
     }
 
     /**
      * For the sake of non-circular checks "equals" checks for relationship attributes must be checked
      * on only one side of the relationship. In the case of OneToMany relationships it will be done on
      * the "One" side (the one holding the List)
-     *
+     * <p>
      * On the "Many" Side we'll ignore the attribute when doing the equals comparison as a way to avoid
      * a circular reference starting and endless cycle.
      *
@@ -118,17 +124,19 @@ public abstract class ScaleIOSDSElementInfo
      * @return true if their attributes are equal
      */
     @Override
-    public boolean equals(Object other) {
-        if (other == this) {
+    public boolean equals(Object other)
+    {
+        if (other == this)
+        {
             return true;
         }
-        if (!(other instanceof ScaleIOSDSElementInfo)) {
+        if (!(other instanceof ScaleIOSDSElementInfo))
+        {
             return false;
         }
         //Toot stands for "That Object Over There"
         ScaleIOSDSElementInfo toot = ((ScaleIOSDSElementInfo) other);
-        return new EqualsBuilder().append(uuid, toot.uuid).append(id, toot.id).append(port, toot.port)
-                .append(versionInfo, toot.versionInfo).append(name, toot.name).append(role, toot.role)
-                .append(managementIPs, toot.managementIPs).append(ips, toot.ips).isEquals();
+        return new EqualsBuilder().append(uuid, toot.uuid).append(id, toot.id).append(port, toot.port).append(versionInfo, toot.versionInfo)
+                .append(name, toot.name).append(role, toot.role).append(managementIPs, toot.managementIPs).append(ips, toot.ips).isEquals();
     }
 }

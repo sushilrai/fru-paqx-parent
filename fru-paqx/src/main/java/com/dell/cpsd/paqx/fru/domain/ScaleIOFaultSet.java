@@ -1,3 +1,8 @@
+/**
+ * Copyright &copy; 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
+ * Dell EMC Confidential/Proprietary Information
+ */
+
 package com.dell.cpsd.paqx.fru.domain;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -16,10 +21,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by kenefj on 03/05/17.
+ * Copyright &copy; 2017 Dell Inc. or its subsidiaries.  All Rights Reserved.
+ * Dell EMC Confidential/Proprietary Information
  */
 @Entity
-@Table(name="SCALEIO_FAULTSET")
+@Table(name = "SCALEIO_FAULTSET")
 public class ScaleIOFaultSet
 {
     @Id
@@ -37,12 +43,12 @@ public class ScaleIOFaultSet
     private ScaleIOProtectionDomain protectionDomain;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "faultSet", orphanRemoval = true)
-    private List<ScaleIOSDS>        sdsList = new ArrayList<>();
+    private List<ScaleIOSDS> sdsList = new ArrayList<>();
 
     public ScaleIOFaultSet(final String id, final String faultSetName)
     {
-        this.id=id;
-        this.name=faultSetName;
+        this.id = id;
+        this.name = faultSetName;
     }
 
     public Long getUuid()
@@ -86,7 +92,8 @@ public class ScaleIOFaultSet
     }
 
     @Override
-    public int hashCode() {
+    public int hashCode()
+    {
         return new HashCodeBuilder().append(uuid).append(id).append(name).append(sdsList).toHashCode();
     }
 
@@ -94,7 +101,7 @@ public class ScaleIOFaultSet
      * For the sake of non-circular checks "equals" checks for relationship attributes must be checked
      * on only one side of the relationship. In the case of OneToMany relationships it will be done on
      * the "One" side (the one holding the List)
-     *
+     * <p>
      * On the "Many" Side we'll ignore the attribute when doing the equals comparison as a way to avoid
      * a circular reference starting and endless cycle.
      *
@@ -102,16 +109,19 @@ public class ScaleIOFaultSet
      * @return true if their attributes are equal
      */
     @Override
-    public boolean equals(Object other) {
-        if (other == this) {
+    public boolean equals(Object other)
+    {
+        if (other == this)
+        {
             return true;
         }
-        if (!(other instanceof ScaleIOFaultSet)) {
+        if (!(other instanceof ScaleIOFaultSet))
+        {
             return false;
         }
         //Toot stands for "That Object Over There"
         ScaleIOFaultSet toot = ((ScaleIOFaultSet) other);
-        return new EqualsBuilder().append(uuid, toot.uuid).append(id, toot.id).append(name, toot.name)
-                .append(sdsList, toot.sdsList).isEquals();
+        return new EqualsBuilder().append(uuid, toot.uuid).append(id, toot.id).append(name, toot.name).append(sdsList, toot.sdsList)
+                .isEquals();
     }
 }
