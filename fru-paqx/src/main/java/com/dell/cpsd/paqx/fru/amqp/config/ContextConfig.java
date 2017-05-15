@@ -81,39 +81,6 @@ public class ContextConfig extends ConsumerContextConfig {
             }
         };
 
-        //Setup the redirection
-        tomcat.addAdditionalTomcatConnectors(initiateHttpConnector());
-
-        //Setup the custom realm, which sets the custom redirect code.
-        //By default the redirect is 302.  But if the request to be redirected is a post,
-        //then the post is converted to a get and therefore the post's body is removed in the redirect. (e.g. using CURL)
-
-        //We need to set the redirection with code 307 so that the origin method is used in the redirect
-        //e.g. get uses get on redirect and post uses post on redirect.
-        //This conforms to standard RFC 2616
-        tomcat.addContextCustomizers((TomcatContextCustomizer) context ->
-        {
-            RealmBase base = new CombinedRealm();
-            base.setTransportGuaranteeRedirectStatus(307);
-            context.setRealm(base);
-
-        });
         return tomcat;
-    }
-
-    /**
-     * This method sets up the redirect itself, creating a connector object with the new ports and protocol
-     *
-     * @return
-     */
-    private Connector initiateHttpConnector() {
-        Connector connector = new Connector("org.apache.coyote.http11.Http11NioProtocol");
-        connector.setScheme("http");
-        connector.setPort(8085);
-        connector.setSecure(false);
-        connector.setRedirectPort(18443);
-        connector.setProperty("transportGuaranteeRedirectStatus", "307");
-
-        return connector;
     }
 }
