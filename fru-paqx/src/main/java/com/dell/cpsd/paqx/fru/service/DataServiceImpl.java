@@ -9,14 +9,18 @@ package com.dell.cpsd.paqx.fru.service;
 import com.dell.cpsd.paqx.fru.domain.ScaleIOData;
 import com.dell.cpsd.paqx.fru.dto.FRUSystemData;
 import com.dell.cpsd.paqx.fru.rest.dto.vCenterSystemProperties;
+import com.dell.cpsd.paqx.fru.rest.dto.vcenter.discovery.DataCenterDto;
 import com.dell.cpsd.paqx.fru.rest.repository.DataServiceRepository;
+import com.dell.cpsd.paqx.fru.transformers.DiscoveryInfoToVCenterSystemPropertiesTransformer;
 import com.dell.cpsd.paqx.fru.transformers.ScaleIORestToScaleIODomainTransformer;
 import com.dell.cpsd.storage.capabilities.api.ScaleIOSystemDataRestRep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -35,10 +39,14 @@ public class DataServiceImpl implements DataService {
     ScaleIORestToScaleIODomainTransformer scaleIORestToScaleIODomainTransformer;
 
     @Autowired
-    public DataServiceImpl(DataServiceRepository repository, ScaleIORestToScaleIODomainTransformer scaleIORestToScaleIODomainTransformer)
+    private DiscoveryInfoToVCenterSystemPropertiesTransformer discoveryInfoToVCenterSystemPropertiesTransformer;
+
+    @Autowired
+    public DataServiceImpl(DataServiceRepository repository, ScaleIORestToScaleIODomainTransformer scaleIORestToScaleIODomainTransformer, DiscoveryInfoToVCenterSystemPropertiesTransformer discoveryInfoToVCenterSystemPropertiesTransformer)
     {
         this.repository=repository;
         this.scaleIORestToScaleIODomainTransformer=scaleIORestToScaleIODomainTransformer;
+        this.discoveryInfoToVCenterSystemPropertiesTransformer=discoveryInfoToVCenterSystemPropertiesTransformer;
     }
 
     @Override
