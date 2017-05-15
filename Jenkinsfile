@@ -63,7 +63,8 @@ pipeline {
                 }
             }
             steps {
-                sh "mvn deploy -DskipTests=true -DskipITs -P buildDockerImageOnJenkins -Ddocker.registry=docker-dev-local.art.local"
+                sh "mvn deploy -P buildDockerImageOnJenkins -DdockerImage.tag=api-gateway-parent-develop.${env.BUILD_NUMBER} -Ddocker.registry=docker-dev-local.art.local -DdeleteDockerImages=true -DskipTests=true -DskipITs"
+		archiveArtifacts artifacts: '**/*.rpm', fingerprint: true
             }
         }
         stage('SonarQube Analysis') {
