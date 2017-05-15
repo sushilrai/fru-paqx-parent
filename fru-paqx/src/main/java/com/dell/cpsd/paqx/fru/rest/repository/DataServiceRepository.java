@@ -7,6 +7,8 @@ package com.dell.cpsd.paqx.fru.rest.repository;
 import com.dell.cpsd.paqx.fru.domain.Host;
 import com.dell.cpsd.paqx.fru.domain.ScaleIOData;
 import com.dell.cpsd.paqx.fru.domain.VCenter;
+import com.dell.cpsd.paqx.fru.dto.SDSListDto;
+import com.dell.cpsd.paqx.fru.rest.representation.HostRepresentation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -26,4 +28,7 @@ public interface DataServiceRepository
 
     @Transactional
     List<Host> getVCenterHosts(String jobId);
+
+    @Transactional
+    List<SDSListDto> getScaleIODataForSelectedHost(String jobId, HostRepresentation selectedHost);
 }

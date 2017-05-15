@@ -153,6 +153,11 @@ public class ScaleIOSDS
         this.roleIPs.add(roleIP1);
     }
 
+    public List<ScaleIORoleIP> getRoleIPs()
+    {
+        return roleIPs;
+    }
+
     public void addDevice(final ScaleIODevice device)
     {
         this.devices.add(device);

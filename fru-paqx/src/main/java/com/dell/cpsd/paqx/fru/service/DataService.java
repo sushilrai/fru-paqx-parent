@@ -6,9 +6,11 @@
 package com.dell.cpsd.paqx.fru.service;
 
 
+import com.dell.cpsd.paqx.fru.domain.ScaleIOSDS;
 import com.dell.cpsd.paqx.fru.dto.FRUSystemData;
 import com.dell.cpsd.paqx.fru.rest.dto.vCenterSystemProperties;
 import com.dell.cpsd.paqx.fru.rest.representation.HostRepresentation;
+import com.dell.cpsd.storage.capabilities.api.SIONodeRemoveRequestMessage;
 import com.dell.cpsd.storage.capabilities.api.ScaleIOSystemDataRestRep;
 
 import java.util.List;
@@ -26,4 +28,6 @@ public interface DataService {
     void saveVcenterData(UUID jobId, vCenterSystemProperties vcenterSystemProperties);
 
     List<HostRepresentation> getVCenterHosts(String jobId);
+
+    List<SIONodeRemoveRequestMessage> getSDSHostsToRemoveFromHostRepresentation(String jobId, HostRepresentation selectedHost);
 }

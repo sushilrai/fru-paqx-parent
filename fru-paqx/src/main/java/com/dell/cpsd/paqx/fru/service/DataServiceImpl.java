@@ -9,13 +9,16 @@ package com.dell.cpsd.paqx.fru.service;
 import com.dell.cpsd.paqx.fru.domain.Host;
 import com.dell.cpsd.paqx.fru.domain.ScaleIOData;
 import com.dell.cpsd.paqx.fru.dto.FRUSystemData;
+import com.dell.cpsd.paqx.fru.dto.SDSListDto;
 import com.dell.cpsd.paqx.fru.rest.dto.vCenterSystemProperties;
 import com.dell.cpsd.paqx.fru.rest.dto.vcenter.discovery.DataCenterDto;
 import com.dell.cpsd.paqx.fru.rest.repository.DataServiceRepository;
 import com.dell.cpsd.paqx.fru.rest.representation.HostRepresentation;
 import com.dell.cpsd.paqx.fru.transformers.DiscoveryInfoToVCenterSystemPropertiesTransformer;
 import com.dell.cpsd.paqx.fru.transformers.HostListToHostRepresentationTransformer;
+import com.dell.cpsd.paqx.fru.transformers.SDSListDtoToRemoveScaleIOMessageTransformer;
 import com.dell.cpsd.paqx.fru.transformers.ScaleIORestToScaleIODomainTransformer;
+import com.dell.cpsd.storage.capabilities.api.SIONodeRemoveRequestMessage;
 import com.dell.cpsd.storage.capabilities.api.ScaleIOSystemDataRestRep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -48,13 +51,17 @@ public class DataServiceImpl implements DataService {
     HostListToHostRepresentationTransformer hostListToHostRepresentationTransformer;
 
     @Autowired
+    private SDSListDtoToRemoveScaleIOMessageTransformer sdsListDtoToRemoveScaleIOMessageTransformer;
+
+    @Autowired
     public DataServiceImpl(DataServiceRepository repository, ScaleIORestToScaleIODomainTransformer scaleIORestToScaleIODomainTransformer, DiscoveryInfoToVCenterSystemPropertiesTransformer discoveryInfoToVCenterSystemPropertiesTransformer,
-            HostListToHostRepresentationTransformer hostListToHostRepresentationTransformer)
+            HostListToHostRepresentationTransformer hostListToHostRepresentationTransformer, SDSListDtoToRemoveScaleIOMessageTransformer sdsListDtoToRemoveScaleIOMessageTransformer)
     {
         this.repository=repository;
         this.scaleIORestToScaleIODomainTransformer=scaleIORestToScaleIODomainTransformer;
         this.discoveryInfoToVCenterSystemPropertiesTransformer=discoveryInfoToVCenterSystemPropertiesTransformer;
         this.hostListToHostRepresentationTransformer=hostListToHostRepresentationTransformer;
+        this.sdsListDtoToRemoveScaleIOMessageTransformer = sdsListDtoToRemoveScaleIOMessageTransformer;
     }
 
     @Override
@@ -81,6 +88,13 @@ public class DataServiceImpl implements DataService {
     {
         List<Host> hostList=repository.getVCenterHosts(jobId);
         return hostListToHostRepresentationTransformer.transform(hostList);
+    }
+
+    @Override
+    public List<SIONodeRemoveRequestMessage> getSDSHostsToRemoveFromHostRepresentation(String jobId, HostRepresentation selectedHost)
+    {
+        List<SDSListDto> hostList=repository.getScaleIODataForSelectedHost(jobId, selectedHost);
+        return sdsListDtoToRemoveScaleIOMessageTransformer.transform(hostList);
     }
 
     private FRUSystemData ensureSystemDataExists(UUID jobId) {
