@@ -429,6 +429,7 @@
                             <includeConstructors>true</includeConstructors>
                             <includeAdditionalProperties>true</includeAdditionalProperties>
                             <serializable>false</serializable>
+                            <sourceSortOrder>FILES_FIRST</sourceSortOrder>
                             <customAnnotator>com.dell.cpsd.common.contract.enricher.plugins.jsonschema2pojo.MessageAnnotator
                             </customAnnotator>
                             <customRuleFactory>com.dell.cpsd.common.contract.enricher.plugins.jsonschema2pojo.DefaultRuleFactory

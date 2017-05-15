@@ -8,8 +8,10 @@ package com.dell.cpsd.paqx.fru.service;
 
 import com.dell.cpsd.paqx.fru.dto.FRUSystemData;
 import com.dell.cpsd.paqx.fru.rest.dto.vCenterSystemProperties;
+import com.dell.cpsd.paqx.fru.rest.representation.HostRepresentation;
 import com.dell.cpsd.storage.capabilities.api.ScaleIOSystemDataRestRep;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -23,4 +25,5 @@ public interface DataService {
 
     void saveVcenterData(UUID jobId, vCenterSystemProperties vcenterSystemProperties);
 
+    List<HostRepresentation> getVCenterHosts(String jobId);
 }

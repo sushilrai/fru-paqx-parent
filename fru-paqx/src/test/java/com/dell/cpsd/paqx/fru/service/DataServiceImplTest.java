@@ -33,7 +33,7 @@ import static org.junit.Assert.assertNotNull;
  * Dell EMC Confidential/Proprietary Information
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class DataServiceImplTest
 {
     @Autowired

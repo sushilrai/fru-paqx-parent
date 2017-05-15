@@ -11,6 +11,7 @@ import org.springframework.http.HttpMethod;
 import javax.ws.rs.core.Link;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -29,6 +30,8 @@ public class JobRepresentation
     private String lastResponse;
 
     private Set<LinkRepresentation> links = new HashSet<>();
+    private List<HostRepresentation> hostRepresentations;
+    private HostRepresentation       selectedHostRepresentation;
 
     public JobRepresentation(final Job job)
     {
@@ -100,5 +103,15 @@ public class JobRepresentation
     public void setLastResponse(final String lastResponse)
     {
         this.lastResponse = lastResponse;
+    }
+
+    public void setHostRepresentations(final List<HostRepresentation> hostRepresentations)
+    {
+        this.hostRepresentations = hostRepresentations;
+    }
+
+    public void setSelectedHostRepresentation(final HostRepresentation selectedHostRepresentation)
+    {
+        this.selectedHostRepresentation = selectedHostRepresentation;
     }
 }

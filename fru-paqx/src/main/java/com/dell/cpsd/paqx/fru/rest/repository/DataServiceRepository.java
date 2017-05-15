@@ -4,10 +4,12 @@
  */
 package com.dell.cpsd.paqx.fru.rest.repository;
 
+import com.dell.cpsd.paqx.fru.domain.Host;
 import com.dell.cpsd.paqx.fru.domain.ScaleIOData;
 import com.dell.cpsd.paqx.fru.domain.VCenter;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -21,4 +23,7 @@ public interface DataServiceRepository
 
     @Transactional
     Long saveVCenterData(UUID jobId, VCenter data);
+
+    @Transactional
+    List<Host> getVCenterHosts(String jobId);
 }
