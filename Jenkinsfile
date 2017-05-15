@@ -18,7 +18,7 @@ pipeline {
     }
     environment {
         GITHUB_TOKEN = credentials('github-02')
-        COMPOSE_PROJECT_NAME = '${BRANCH_NAME}-${BUILD_NUMBER}'
+        COMPOSE_PROJECT_NAME = 'fru-paqx-parent-develop-${env.BUILD_NUMBER}'
 
     }
     options { 
@@ -38,7 +38,7 @@ pipeline {
         stage('Prepare test services') {
             steps {
                 sh "docker-compose -f ${WORKSPACE}/ci/docker/docker-compose.yml pull"
-		sh "export BUILD_NUMBER=${env.BUILD_NUMBER}; export BRANCH_NAME=fru-paqx-parent-develop; docker-compose -f ${WORKSPACE}/ci/docker/docker-compose.yml up --force-recreate -d"
+		sh "docker-compose -f ${WORKSPACE}/ci/docker/docker-compose.yml up --force-recreate -d"
 
             }
         }
