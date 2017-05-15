@@ -47,16 +47,6 @@ pipeline {
                 sh "docker exec fru-paqx-test-${COMPOSE_PROJECT_NAME} mvn clean verify -DskipDocker=true"
             }
         }
-	    stage('Package') {
-	        when {
-                expression {
-                    return !(env.BRANCH_NAME ==~ /master|develop|release\/.*/)
-                }
-            }
-		    steps {
-                sh "mvn package -DskipTests=true -DskipITs"
-            }
-    	}
         stage('Deploy') {
 	        when {
                 expression {
@@ -65,6 +55,7 @@ pipeline {
             }
             steps {
                 sh "mvn deploy -P buildDockerImageOnJenkins -DdockerImage.tag=api-gateway-parent-develop.${env.BUILD_NUMBER} -Ddocker.registry=docker-dev-local.art.local -DdeleteDockerImages=true -DskipTests=true -DskipITs"
+		sh "cd ${WORKSPACE}/fru-paqx-distribution; docker/compose/build_rpm.sh"
 		archiveArtifacts artifacts: '**/*.rpm', fingerprint: true
             }
         }
@@ -93,7 +84,7 @@ pipeline {
         stage('NexB Scan') {
 	        when {
                 expression {
-                    return env.BRANCH_NAME ==~ /master|develop|release\/.*/
+                    return env.BRANCH_NAME ==~ /develop|release\/.*/
                 }
             }
             steps {
