@@ -18,7 +18,7 @@ pipeline {
     }
     environment {
         GITHUB_TOKEN = credentials('github-02')
-        COMPOSE_PROJECT_NAME = 'fru-paqx-parent-develop-${env.BUILD_NUMBER}'
+        COMPOSE_PROJECT_NAME = "fru-paqx-parent-develop-${env.BUILD_NUMBER}"
 
     }
     options { 
