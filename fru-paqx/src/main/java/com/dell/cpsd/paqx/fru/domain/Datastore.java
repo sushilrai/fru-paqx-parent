@@ -22,6 +22,8 @@ public class Datastore {
     @Column(name = "DATASTORE_URL")
     private String url;
 
+    public Datastore(){}
+
     public Datastore(String id, String name, String type, String url) {
         this.id = id;
         this.name = name;

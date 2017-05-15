@@ -24,6 +24,8 @@ public class Cluster {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "cluster", orphanRemoval = true)
     List<Host> hostList = new ArrayList<>();
 
+    public Cluster(){}
+
     public Cluster(String id, String name) {
         this.id = id;
         this.name = name;
@@ -63,6 +65,10 @@ public class Cluster {
 
     public List<Host> getHostList() {
         return hostList;
+    }
+
+    public void setHostList(List<Host> hostList) {
+        this.hostList = hostList;
     }
 
     public void addHost(Host host) {

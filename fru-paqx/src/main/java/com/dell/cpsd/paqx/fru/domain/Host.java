@@ -39,6 +39,8 @@ public class Host {
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "host", orphanRemoval = true)
     private HostDnsConfig hostDnsConfig;
 
+    public Host(){}
+
     public Host(String id, String name, String powerState) {
         this.id = id;
         this.name = name;

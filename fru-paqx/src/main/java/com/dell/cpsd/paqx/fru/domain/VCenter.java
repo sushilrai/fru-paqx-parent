@@ -57,4 +57,8 @@ public class VCenter {
     public void setDatacenterList(List<Datacenter> datacenterList) {
         this.datacenterList = datacenterList;
     }
+
+    public void addDatacenter(Datacenter datacenter){
+        this.datacenterList.add(datacenter);
+    }
 }

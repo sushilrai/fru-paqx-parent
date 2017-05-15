@@ -18,6 +18,8 @@ public class Datacenter {
     @Column(name = "DATACENTER_NAME")
     private String name;
 
+    public Datacenter(){}
+
     public Datacenter(String id, String name) {
         this.id = id;
         this.name = name;

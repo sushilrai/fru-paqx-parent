@@ -22,6 +22,8 @@ public class VSwitch {
     @ManyToOne(cascade = CascadeType.ALL)
     private Host host;
 
+    public VSwitch(){}
+
     public VSwitch(String id, String name, boolean allowPromiscuous) {
         this.id = id;
         this.name = name;
