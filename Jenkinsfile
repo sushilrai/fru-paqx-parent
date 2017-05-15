@@ -55,7 +55,7 @@ pipeline {
             }
             steps {
                 sh "mvn deploy -P buildDockerImageOnJenkins -DdockerImage.tag=api-gateway-parent-develop.${env.BUILD_NUMBER} -Ddocker.registry=docker-dev-local.art.local -DdeleteDockerImages=true -DskipTests=true -DskipITs"
-		sh "cd ${WORKSPACE}/fru-paqx-distribution; docker/compose/build_rpm.sh"
+		sh "cd ${WORKSPACE}/fru-paqx-distribution; ${WORKSPACE}/fru-paqx-distribution/docker/compose/build_rpm.sh"
 		archiveArtifacts artifacts: '**/*.rpm', fingerprint: true
             }
         }
