@@ -7,6 +7,7 @@ import com.dell.cpsd.paqx.fru.domain.Datastore;
 import com.dell.cpsd.paqx.fru.domain.HostDnsConfig;
 import com.dell.cpsd.paqx.fru.domain.HostIpRouteConfig;
 import com.dell.cpsd.virtualization.capabilities.api.*;
+import com.dell.cpsd.virtualization.capabilities.api.Network;
 
 import java.util.List;
 import java.util.Objects;
@@ -52,9 +53,12 @@ public class DiscoveryInfoToVCenterDomainTransformer {
                 .collect(Collectors.toList());
         returnVal.setDatastoreList(datastores);
 
-
         // Tranform and link dvswitches
-
+        List<DVSwitch> dvSwitches = datacenter.getDvSwitches()
+                .stream().filter(Objects::nonNull)
+                .map(dvSwitch -> transformDVSwitch(dvSwitch, returnVal))
+                .collect(Collectors.toList());
+        returnVal.setDvSwitchList(dvSwitches);
 
         // Transform and link clusters
         List<Cluster> clusters = datacenter.getClusters()
@@ -62,6 +66,11 @@ public class DiscoveryInfoToVCenterDomainTransformer {
                 .map(cluster -> transformCluster(cluster, returnVal))
                 .collect(Collectors.toList());
         returnVal.setClusterList(clusters);
+
+        // TODO: Link Host Pnics to Dvswitches
+        // TODO: Link Datastores to Hosts
+        // TODO: Link Virtual Nics to DVPortgroups
+        // TODO: Link VMGuestNetworks to DVPortgroups
 
         // FK link
         returnVal.setvCenter(vCenter);
@@ -85,6 +94,36 @@ public class DiscoveryInfoToVCenterDomainTransformer {
 
         return returnVal;
     }
+
+    private DVSwitch transformDVSwitch(DvSwitch dvSwitch, Datacenter datacenter)
+    {
+        if (dvSwitch == null){
+            return null;
+        }
+        DVSwitch returnVal = new DVSwitch();
+        returnVal.setId(dvSwitch.getId());
+        returnVal.setName(dvSwitch.getName());
+        returnVal.setAllowPromiscuous(dvSwitch.getVMwareDVSConfigInfo().getDVPortSetting().getDVSSecurityPolicy().getAllowPromicuous());
+
+        // FK link
+        returnVal.setDatacenter(datacenter);
+
+        return returnVal;
+    }
+
+    // TODO: fix up how we map networks
+    private DVPortGroup transformDVPortgroup(Network network)
+    {
+        if (network == null){
+            return null;
+        }
+        DVPortGroup returnVal = new DVPortGroup();
+        returnVal.setId(network.getId());
+        returnVal.setName(network.getName());
+
+        return returnVal;
+    }
+
 
     private Cluster transformCluster(com.dell.cpsd.virtualization.capabilities.api.Cluster cluster, Datacenter datacenter)
     {

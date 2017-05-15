@@ -37,6 +37,8 @@ public class VirtualNic {
     @OneToOne(mappedBy = "virtualNic")
     private VirtualNicDVPortGroup virtualNicDVPortGroup;
 
+    public VirtualNic(){}
+
     public VirtualNic(String device, String port, String portGroup, String mac, boolean dhcp, String ip, String subnetMask) {
         this.device = device;
         this.port = port;

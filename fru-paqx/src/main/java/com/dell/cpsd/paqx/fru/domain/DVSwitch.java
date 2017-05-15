@@ -21,6 +21,8 @@ public class DVSwitch {
     @Column(name = "ALLOW_PROMISCUOUS")
     private boolean allowPromiscuous;
 
+    public DVSwitch(){}
+
     public DVSwitch(String id, String name, boolean allowPromiscuous) {
         this.id = id;
         this.name = name;
