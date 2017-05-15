@@ -38,7 +38,8 @@ pipeline {
         stage('Prepare test services') {
             steps {
                 sh "docker-compose -f ${WORKSPACE}/ci/docker/docker-compose.yml pull"
-                sh "export BUILD_NUMBER=${env.BUILD_NUMBER}; export BRANCH_NAME="fru-paqx-parent-develop"; docker-compose -f ${WORKSPACE}/ci/docker/docker-compose.yml up --force-recreate -d"
+		sh "export BUILD_NUMBER=${env.BUILD_NUMBER}; export BRANCH_NAME=fru-paqx-parent-develop; docker-compose -f ${WORKSPACE}/ci/docker/docker-compose.yml up --force-recreate -d"
+
             }
         }
         stage('Integration Test') {
