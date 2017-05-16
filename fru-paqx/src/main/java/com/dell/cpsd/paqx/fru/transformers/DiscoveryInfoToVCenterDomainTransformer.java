@@ -6,6 +6,7 @@ import com.dell.cpsd.paqx.fru.domain.Datacenter;
 import com.dell.cpsd.paqx.fru.domain.Datastore;
 import com.dell.cpsd.paqx.fru.domain.HostDnsConfig;
 import com.dell.cpsd.paqx.fru.domain.HostIpRouteConfig;
+import com.dell.cpsd.paqx.fru.domain.VirtualMachine;
 import com.dell.cpsd.virtualization.capabilities.api.*;
 import com.dell.cpsd.virtualization.capabilities.api.Network;
 
@@ -46,14 +47,20 @@ public class DiscoveryInfoToVCenterDomainTransformer {
         returnVal.setId(datacenter.getId());
         returnVal.setName(datacenter.getName());
 
+        // Transform vms
+        List<VirtualMachine> virtualMachines = datacenter.getVms()
+                .stream().filter(Objects::nonNull)
+                .map(virtualMachine -> transformVirtualMachine(virtualMachine))
+                .collect(Collectors.toList());
+
         // Transform and link datastores
         List<Datastore> datastores = datacenter.getDatastores()
                 .stream().filter(Objects::nonNull)
-                .map(datastore -> transformDatastore(datastore, returnVal))
+                .map(datastore -> transformDatastore(datastore, returnVal, virtualMachines))
                 .collect(Collectors.toList());
         returnVal.setDatastoreList(datastores);
 
-        // Tranform and link dvswitches
+        // Transform and link dvswitches
         List<DVSwitch> dvSwitches = datacenter.getDvSwitches()
                 .stream().filter(Objects::nonNull)
                 .map(dvSwitch -> transformDVSwitch(dvSwitch, returnVal))
@@ -63,7 +70,7 @@ public class DiscoveryInfoToVCenterDomainTransformer {
         // Transform and link clusters
         List<Cluster> clusters = datacenter.getClusters()
                 .stream().filter(Objects::nonNull)
-                .map(cluster -> transformCluster(cluster, returnVal))
+                .map(cluster -> transformCluster(cluster, returnVal, virtualMachines))
                 .collect(Collectors.toList());
         returnVal.setClusterList(clusters);
 
@@ -78,7 +85,7 @@ public class DiscoveryInfoToVCenterDomainTransformer {
         return returnVal;
     }
 
-    private Datastore transformDatastore(com.dell.cpsd.virtualization.capabilities.api.Datastore datastore, Datacenter datacenter)
+    private Datastore transformDatastore(com.dell.cpsd.virtualization.capabilities.api.Datastore datastore, Datacenter datacenter, List<VirtualMachine> virtualMachines)
     {
         if (datastore == null){
             return null;
@@ -88,6 +95,13 @@ public class DiscoveryInfoToVCenterDomainTransformer {
         returnVal.setName(datastore.getName());
         returnVal.setType(datastore.getDatastoreSummary().getType());
         returnVal.setUrl(datastore.getDatastoreSummary().getUrl());
+
+        // One to Many Link to VMs
+        List<VirtualMachine> vmsOnDatastore = virtualMachines.stream()
+                .filter(virtualMachine -> datastore.getVmIds().contains(virtualMachine.getId()))
+                .collect(Collectors.toList());
+        vmsOnDatastore.forEach(virtualMachine -> virtualMachine.setDatastore(returnVal));
+        returnVal.setVirtualMachineList(vmsOnDatastore);
 
         // FK link
         returnVal.setDatacenter(datacenter);
@@ -125,7 +139,7 @@ public class DiscoveryInfoToVCenterDomainTransformer {
     }
 
 
-    private Cluster transformCluster(com.dell.cpsd.virtualization.capabilities.api.Cluster cluster, Datacenter datacenter)
+    private Cluster transformCluster(com.dell.cpsd.virtualization.capabilities.api.Cluster cluster, Datacenter datacenter, List<VirtualMachine> virtualMachines)
     {
         if (cluster == null){
             return null;
@@ -137,8 +151,7 @@ public class DiscoveryInfoToVCenterDomainTransformer {
         // Transform and link hosts
         List<Host> hosts = cluster.getHosts()
                 .stream().filter(Objects::nonNull)
-                .map(hostSystem -> transformHost(hostSystem, returnVal)).collect(Collectors.toList());
-
+                .map(hostSystem -> transformHost(hostSystem, returnVal, virtualMachines)).collect(Collectors.toList());
         returnVal.setHostList(hosts);
 
         // FK link
@@ -147,7 +160,7 @@ public class DiscoveryInfoToVCenterDomainTransformer {
         return returnVal;
     }
 
-    private Host transformHost(HostSystem hostSystem, Cluster cluster)
+    private Host transformHost(HostSystem hostSystem, Cluster cluster, List<VirtualMachine> virtualMachines)
     {
         if (hostSystem == null){
             return null;
@@ -173,6 +186,13 @@ public class DiscoveryInfoToVCenterDomainTransformer {
                 .stream().filter(Objects::nonNull)
                 .map(hostVirtualSwitch -> transformVSwitch(hostVirtualSwitch, returnVal)).collect(Collectors.toList());
         returnVal.setvSwitchList(vSwitches);
+
+        // One to Many Link to VMs
+        List<VirtualMachine> vmsOnHost = virtualMachines.stream()
+                .filter(virtualMachine -> hostSystem.getVmIds().contains(virtualMachine.getId()))
+                .collect(Collectors.toList());
+        vmsOnHost.forEach(virtualMachine -> virtualMachine.setHost(returnVal));
+        returnVal.setVirtualMachineList(vmsOnHost);
 
         // FK Link
         returnVal.setCluster(cluster);
@@ -228,6 +248,59 @@ public class DiscoveryInfoToVCenterDomainTransformer {
         // FK link
         returnVal.setHost(host);
 
+        return returnVal;
+    }
+
+    private VirtualMachine transformVirtualMachine(com.dell.cpsd.virtualization.capabilities.api.VirtualMachine virtualMachine)
+    {
+        if (virtualMachine == null){
+            return null;
+        }
+        VirtualMachine returnVal = new VirtualMachine();
+        returnVal.setName(virtualMachine.getName());
+        returnVal.setId(virtualMachine.getId());
+        returnVal.setGuestHostname(virtualMachine.getGuestInfo().getHostName());
+        returnVal.setGuestOS(virtualMachine.getGuestInfo().getGuestFullName());
+
+        List<VMNetwork> vmNetworks = virtualMachine.getGuestInfo().getNet()
+                .stream().filter(Objects::nonNull)
+                .map(guestNicInfo -> transformVMNetwork(guestNicInfo, returnVal))
+                .collect(Collectors.toList());
+        returnVal.setVmNetworkList(vmNetworks);
+
+        // No FK link to hosts and datastores at this level
+        return returnVal;
+    }
+
+    private VMNetwork transformVMNetwork(GuestNicInfo guestNicInfo, VirtualMachine virtualMachine)
+    {
+        if (guestNicInfo == null){
+            return null;
+        }
+        VMNetwork returnVal = new VMNetwork();
+        returnVal.setConnected(guestNicInfo.getConnected());
+        returnVal.setMacAddress(guestNicInfo.getMacAddress());
+
+        List<VMIP> vmips = guestNicInfo.getIpAddresses()
+                .stream().filter(Objects::nonNull)
+                .map(s -> transformVMIP(s, returnVal))
+                .collect(Collectors.toList());
+        returnVal.setVmip(vmips);
+
+        // FK link
+        returnVal.setVirtualMachine(virtualMachine);
+        return returnVal;
+    }
+
+    private VMIP transformVMIP(String ip, VMNetwork vmNetwork)
+    {
+        if (ip == null){
+            return null;
+        }
+        VMIP returnVal = new VMIP(ip);
+
+        // FK link
+        returnVal.setVmNetwork(vmNetwork);
         return returnVal;
     }
 

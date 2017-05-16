@@ -36,6 +36,8 @@ public class VirtualMachine {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "virtualMachine", orphanRemoval = true)
     private List<VMNetwork> vmNetworkList = new ArrayList<>();
 
+    public VirtualMachine(){}
+
     public VirtualMachine(String id, String name, String powerState, String guestHostname, String guestOS) {
         this.id = id;
         this.name = name;
@@ -110,6 +112,10 @@ public class VirtualMachine {
 
     public List<VMNetwork> getVmNetworkList() {
         return vmNetworkList;
+    }
+
+    public void setVmNetworkList(List<VMNetwork> vmNetworkList) {
+        this.vmNetworkList = vmNetworkList;
     }
 
     public void addVmNetwork(VMNetwork vmNetwork){

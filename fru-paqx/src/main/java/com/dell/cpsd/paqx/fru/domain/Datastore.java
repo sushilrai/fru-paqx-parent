@@ -1,6 +1,8 @@
 package com.dell.cpsd.paqx.fru.domain;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "DATASTORE")
@@ -33,6 +35,9 @@ public class Datastore {
 
     @ManyToOne(cascade = CascadeType.ALL)
     private Datacenter datacenter;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "datastore", orphanRemoval = true)
+    private List<VirtualMachine> virtualMachineList = new ArrayList<>();
 
     public Long getUuid() {
         return uuid;
@@ -80,5 +85,13 @@ public class Datastore {
 
     public void setDatacenter(Datacenter datacenter) {
         this.datacenter = datacenter;
+    }
+
+    public List<VirtualMachine> getVirtualMachineList() {
+        return virtualMachineList;
+    }
+
+    public void setVirtualMachineList(List<VirtualMachine> virtualMachineList) {
+        this.virtualMachineList = virtualMachineList;
     }
 }

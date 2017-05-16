@@ -33,6 +33,9 @@ public class Host {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "host", orphanRemoval = true)
     List<PhysicalNic> physicalNicList = new ArrayList<>();
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "host", orphanRemoval = true)
+    List<VirtualMachine> virtualMachineList = new ArrayList<>();
+
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "host", orphanRemoval = true)
     private HostIpRouteConfig hostIpRouteConfig;
 
@@ -133,5 +136,13 @@ public class Host {
 
     public void setPhysicalNicList(List<PhysicalNic> physicalNicList) {
         this.physicalNicList = physicalNicList;
+    }
+
+    public List<VirtualMachine> getVirtualMachineList() {
+        return virtualMachineList;
+    }
+
+    public void setVirtualMachineList(List<VirtualMachine> virtualMachineList) {
+        this.virtualMachineList = virtualMachineList;
     }
 }

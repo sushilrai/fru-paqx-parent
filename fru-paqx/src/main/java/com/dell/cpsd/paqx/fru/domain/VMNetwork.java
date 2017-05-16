@@ -31,6 +31,8 @@ public class VMNetwork {
             inverseJoinColumns = { @JoinColumn(name = "DV_PORTGROUP_ID", nullable = false)})
     private List<DVPortGroup> dvPortGroupList = new ArrayList<>();
 
+    public VMNetwork(){}
+
     public VMNetwork(boolean connected, String macAddress) {
         this.connected = connected;
         this.macAddress = macAddress;

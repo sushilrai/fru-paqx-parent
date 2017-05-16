@@ -16,6 +16,8 @@ public class VMIP {
     @ManyToOne(cascade = CascadeType.ALL)
     private VMNetwork vmNetwork;
 
+    public VMIP(){}
+
     public VMIP(String ipAddress) {
         this.ipAddress = ipAddress;
     }
