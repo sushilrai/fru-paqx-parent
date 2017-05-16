@@ -29,9 +29,9 @@ public class JobRepresentation
     private int expectedNumberOfSteps = -1;
     private String lastResponse;
 
-    private Set<LinkRepresentation> links = new HashSet<>();
     private List<HostRepresentation> hostRepresentations;
-    private HostRepresentation       selectedHostRepresentation;
+
+    private Set<LinkRepresentation> links = new HashSet<>();
 
     public JobRepresentation(final Job job)
     {
@@ -108,10 +108,5 @@ public class JobRepresentation
     public void setHostRepresentations(final List<HostRepresentation> hostRepresentations)
     {
         this.hostRepresentations = hostRepresentations;
-    }
-
-    public void setSelectedHostRepresentation(final HostRepresentation selectedHostRepresentation)
-    {
-        this.selectedHostRepresentation = selectedHostRepresentation;
     }
 }

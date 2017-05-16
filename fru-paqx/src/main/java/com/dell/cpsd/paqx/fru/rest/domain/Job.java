@@ -6,7 +6,9 @@
 package com.dell.cpsd.paqx.fru.rest.domain;
 
 import com.dell.cpsd.paqx.fru.rest.dto.EndpointCredentials;
+import com.dell.cpsd.paqx.fru.rest.representation.HostRepresentation;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -25,6 +27,10 @@ public class Job {
     private EndpointCredentials coprhdCredentials;
     private EndpointCredentials vcenterCredentials;
     private EndpointCredentials scaleIOCredentials;
+
+    private HostRepresentation selectedHostRepresentation;
+
+    private List<String> selectedVMsToDestroy;
 
     public Job(final UUID id, final String workflow, final String currentStep) {
         this.id = id;
@@ -83,5 +89,25 @@ public class Job {
 
     public void addVcenterCredentials(final EndpointCredentials vcenterCredentials) {
         this.vcenterCredentials = vcenterCredentials;
+    }
+
+    public void setSelectedHostRepresentation(final HostRepresentation selectedHostRepresentation)
+    {
+        this.selectedHostRepresentation = selectedHostRepresentation;
+    }
+
+    public void setSelectedVMsToDestroy(final List<String> selectedVMsToDestroy)
+    {
+        this.selectedVMsToDestroy = selectedVMsToDestroy;
+    }
+
+    public HostRepresentation getSelectedHostRepresentation()
+    {
+        return selectedHostRepresentation;
+    }
+
+    public List<String> getSelectedVMsToDestroy()
+    {
+        return selectedVMsToDestroy;
     }
 }

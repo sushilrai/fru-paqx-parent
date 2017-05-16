@@ -54,9 +54,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * Workflow resource.
@@ -443,17 +445,25 @@ public class WorkflowResource {
         //
         final String thisStep = findStepFromPath(uriInfo);
         final Job job = workflowService.findJob(UUID.fromString(jobId));
+        job.setSelectedHostRepresentation(host);
         final JobRepresentation jobRepresentation = new JobRepresentation(job);
-        jobRepresentation.setSelectedHostRepresentation(host);
+
 
 //        TODO:Example of call to data service to get a scaleioremove message based on scaleio credentials and a esxi host name.
 //        SIONodeRemoveRequestMessage removeMessage = dataService
 //                .getSDSHostsToRemoveFromHostRepresentation(jobId, host, job.getScaleIOCredentials().getEndpointUrl(),
 //                        job.getScaleIOCredentials().getPassword(), job.getScaleIOCredentials().getUsername());
 //
-//        List<DestroyVMRequestMessage> destroyMessage = dataService
+//        List<DestroyVMRequestMessage> destroyVMRequestMessages = dataService
 //                .getDestroyVMRequestMessage(jobId, host, job.getVcenterCredentials().getEndpointUrl(),
 //                        job.getVcenterCredentials().getPassword(), job.getVcenterCredentials().getUsername());
+//        if (destroyVMRequestMessages != null)
+//        {
+//            job.setSelectedVMsToDestroy(
+//                    destroyVMRequestMessages.stream().filter(Objects::nonNull).map(x -> x.getUuid()).filter(Objects::nonNull)
+//                            .collect(Collectors.toList()));
+//        }
+
 
         final NextStep nextStep = workflowService.findNextStep(job.getWorkflow(), thisStep);
         if (nextStep != null) {
