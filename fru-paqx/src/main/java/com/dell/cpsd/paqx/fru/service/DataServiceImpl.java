@@ -5,20 +5,22 @@
 
 package com.dell.cpsd.paqx.fru.service;
 
-
 import com.dell.cpsd.paqx.fru.domain.Host;
 import com.dell.cpsd.paqx.fru.domain.ScaleIOData;
+import com.dell.cpsd.paqx.fru.dto.DestroyVMDto;
 import com.dell.cpsd.paqx.fru.dto.FRUSystemData;
 import com.dell.cpsd.paqx.fru.dto.ScaleIORemoveDto;
 import com.dell.cpsd.paqx.fru.rest.dto.vCenterSystemProperties;
 import com.dell.cpsd.paqx.fru.rest.repository.DataServiceRepository;
 import com.dell.cpsd.paqx.fru.rest.representation.HostRepresentation;
+import com.dell.cpsd.paqx.fru.transformers.DestroyVMDtoToDestroyVMRequestMessageTransformer;
 import com.dell.cpsd.paqx.fru.transformers.DiscoveryInfoToVCenterSystemPropertiesTransformer;
 import com.dell.cpsd.paqx.fru.transformers.HostListToHostRepresentationTransformer;
 import com.dell.cpsd.paqx.fru.transformers.SDSListDtoToRemoveScaleIOMessageTransformer;
 import com.dell.cpsd.paqx.fru.transformers.ScaleIORestToScaleIODomainTransformer;
 import com.dell.cpsd.storage.capabilities.api.SIONodeRemoveRequestMessage;
 import com.dell.cpsd.storage.capabilities.api.ScaleIOSystemDataRestRep;
+import com.dell.cpsd.virtualization.capabilities.api.DestroyVMRequestMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -52,14 +54,18 @@ public class DataServiceImpl implements DataService {
     private SDSListDtoToRemoveScaleIOMessageTransformer sdsListDtoToRemoveScaleIOMessageTransformer;
 
     @Autowired
+    private DestroyVMDtoToDestroyVMRequestMessageTransformer destroyVMDtoToDestroyVMRequestMessageTransformer;
+
+    @Autowired
     public DataServiceImpl(DataServiceRepository repository, ScaleIORestToScaleIODomainTransformer scaleIORestToScaleIODomainTransformer, DiscoveryInfoToVCenterSystemPropertiesTransformer discoveryInfoToVCenterSystemPropertiesTransformer,
-            HostListToHostRepresentationTransformer hostListToHostRepresentationTransformer, SDSListDtoToRemoveScaleIOMessageTransformer sdsListDtoToRemoveScaleIOMessageTransformer)
+            HostListToHostRepresentationTransformer hostListToHostRepresentationTransformer, SDSListDtoToRemoveScaleIOMessageTransformer sdsListDtoToRemoveScaleIOMessageTransformer, DestroyVMDtoToDestroyVMRequestMessageTransformer destroyVMDtoToDestoryVMRequestMessageTransformer)
     {
         this.repository=repository;
         this.scaleIORestToScaleIODomainTransformer=scaleIORestToScaleIODomainTransformer;
         this.discoveryInfoToVCenterSystemPropertiesTransformer=discoveryInfoToVCenterSystemPropertiesTransformer;
         this.hostListToHostRepresentationTransformer=hostListToHostRepresentationTransformer;
         this.sdsListDtoToRemoveScaleIOMessageTransformer = sdsListDtoToRemoveScaleIOMessageTransformer;
+        this.destroyVMDtoToDestroyVMRequestMessageTransformer=destroyVMDtoToDestoryVMRequestMessageTransformer;
     }
 
     @Override
@@ -90,10 +96,18 @@ public class DataServiceImpl implements DataService {
 
     @Override
     public SIONodeRemoveRequestMessage getSDSHostsToRemoveFromHostRepresentation(String jobId, HostRepresentation selectedHost,
-            final String scaleIOEndpoint, final String scaleIOPassword, final String scaleIOUserName)
+            final String scaleIOEndpoint, final String mdmPassword, final String mdmUserName)
     {
-       ScaleIORemoveDto hostList=repository.getScaleIORemoveDtoForSelectedHost(jobId, selectedHost, scaleIOUserName, scaleIOPassword, scaleIOEndpoint);
+       ScaleIORemoveDto hostList=repository.getScaleIORemoveDtoForSelectedHost(jobId, selectedHost, mdmUserName, mdmPassword, scaleIOEndpoint);
         return sdsListDtoToRemoveScaleIOMessageTransformer.transform(hostList);
+    }
+
+    @Override
+    public List<DestroyVMRequestMessage> getDestroyVMRequestMessage(String jobId, HostRepresentation selectedHost,
+            final String vCenterEndpoint, final String vCenterPassword, final String vCenterUserName)
+    {
+        List<DestroyVMDto> destroyVMDtos=repository.getDestroyVMDtos(jobId, selectedHost, vCenterUserName, vCenterPassword, vCenterEndpoint);
+        return destroyVMDtoToDestroyVMRequestMessageTransformer.transform(destroyVMDtos);
     }
 
     private FRUSystemData ensureSystemDataExists(UUID jobId) {

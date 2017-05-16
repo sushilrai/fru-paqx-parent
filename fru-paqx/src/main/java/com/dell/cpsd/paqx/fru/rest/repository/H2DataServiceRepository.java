@@ -10,6 +10,7 @@ import com.dell.cpsd.paqx.fru.domain.FruJob;
 import com.dell.cpsd.paqx.fru.domain.Host;
 import com.dell.cpsd.paqx.fru.domain.ScaleIOData;
 import com.dell.cpsd.paqx.fru.domain.VCenter;
+import com.dell.cpsd.paqx.fru.dto.DestroyVMDto;
 import com.dell.cpsd.paqx.fru.dto.ScaleIORemoveDto;
 import com.dell.cpsd.paqx.fru.dto.ScaleIORemoveDataDto;
 import com.dell.cpsd.paqx.fru.rest.representation.HostRepresentation;
@@ -25,6 +26,7 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -143,7 +145,7 @@ public class H2DataServiceRepository implements DataServiceRepository
     private List<Object[]> correlateSDSDataWithScaleIOData(final HostRepresentation selectedHost)
     {
         String query =
-                "SELECT scaleio_ip_list.sds_sds_uuid, scaleio_sds.sds_name,vm_ip.ip_address, virtual_machine.uuid, virtual_machine.host_uuid "
+                "SELECT scaleio_ip_list.sds_sds_uuid, scaleio_sds.sds_name,vm_ip.ip_address, virtual_machine.uuid, virtual_machine.host_uuid, virtual_machine.vm_id "
                         + "FROM vm_ip " + "JOIN scaleio_ip_list ON scaleio_ip_list.sds_ip = vm_ip.ip_address "
                         + "JOIN scaleio_sds ON scaleio_ip_list.sds_sds_uuid = scaleio_sds.sds_uuid "
                         + "JOIN vm_guest_network ON vm_ip.vmnetwork_uuid = vm_guest_network.uuid "
@@ -168,7 +170,7 @@ public class H2DataServiceRepository implements DataServiceRepository
             String sdsUuid = (String) columns[0];
             String sdsName = (String) columns[1];
             String vmIpAddress = (String) columns[2];
-            String vmId = (String) columns[3];
+            String vmUuid = (String) columns[3];
             String hostUuid = (String) columns[4];
 
             sdsList.append(sdsName);
@@ -177,6 +179,21 @@ public class H2DataServiceRepository implements DataServiceRepository
         ScaleIORemoveDataDto s = new ScaleIORemoveDataDto("eth0", "empty", mdmList.toString(), sdsList.toString(), sdcList.toString());
         dto.setScaleIORemoveDataDto(s);
         return dto;
+    }
+
+    @Override
+    public List<DestroyVMDto> getDestroyVMDtos(final String jobId, final HostRepresentation selectedHost, final String vCenterUserName,
+            final String vCenterPassword, final String vCenterEndpoint)
+    {
+        List<DestroyVMDto> returnVal = new ArrayList<>();
+        for (Object[] columns : correlateSDSDataWithScaleIOData(selectedHost))
+        {
+
+            String vmid = (String)columns[5];
+            DestroyVMDto dto = new DestroyVMDto(vCenterUserName, vCenterPassword, vCenterEndpoint, vmid);
+            returnVal.add(dto);
+        }
+        return returnVal;
     }
 
     private String getIPAddressFromEndpoint(final String endpointString)

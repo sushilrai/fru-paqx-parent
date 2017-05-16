@@ -21,8 +21,10 @@ import com.dell.cpsd.paqx.fru.service.ScaleIOService;
 import com.dell.cpsd.paqx.fru.service.WorkflowService;
 import com.dell.cpsd.paqx.fru.service.vCenterService;
 import com.dell.cpsd.paqx.fru.valueobject.NextStep;
+import com.dell.cpsd.storage.capabilities.api.SIONodeRemoveRequestMessage;
 import com.dell.cpsd.storage.capabilities.api.ScaleIOSystemDataRestRep;
 import com.dell.cpsd.virtualization.capabilities.api.ClusterOperationResponseMessage;
+import com.dell.cpsd.virtualization.capabilities.api.DestroyVMRequestMessage;
 import com.dell.cpsd.virtualization.capabilities.api.DestroyVMResponseMessage;
 import com.dell.cpsd.virtualization.capabilities.api.HostMaintenanceModeResponseMessage;
 import com.dell.cpsd.virtualization.capabilities.api.HostPowerOperationResponseMessage;
@@ -448,6 +450,10 @@ public class WorkflowResource {
 //        SIONodeRemoveRequestMessage removeMessage = dataService
 //                .getSDSHostsToRemoveFromHostRepresentation(jobId, host, job.getScaleIOCredentials().getEndpointUrl(),
 //                        job.getScaleIOCredentials().getPassword(), job.getScaleIOCredentials().getUsername());
+//
+//        List<DestroyVMRequestMessage> destroyMessage = dataService
+//                .getDestroyVMRequestMessage(jobId, host, job.getVcenterCredentials().getEndpointUrl(),
+//                        job.getVcenterCredentials().getPassword(), job.getVcenterCredentials().getUsername());
 
         final NextStep nextStep = workflowService.findNextStep(job.getWorkflow(), thisStep);
         if (nextStep != null) {

@@ -7,6 +7,7 @@ package com.dell.cpsd.paqx.fru.rest.repository;
 import com.dell.cpsd.paqx.fru.domain.Host;
 import com.dell.cpsd.paqx.fru.domain.ScaleIOData;
 import com.dell.cpsd.paqx.fru.domain.VCenter;
+import com.dell.cpsd.paqx.fru.dto.DestroyVMDto;
 import com.dell.cpsd.paqx.fru.dto.ScaleIORemoveDto;
 import com.dell.cpsd.paqx.fru.rest.representation.HostRepresentation;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,4 +33,8 @@ public interface DataServiceRepository
     @Transactional
     ScaleIORemoveDto getScaleIORemoveDtoForSelectedHost(String jobId, HostRepresentation selectedHost, String userName, String password,
             String endpointString);
+
+    @Transactional
+    List<DestroyVMDto> getDestroyVMDtos(String jobId, HostRepresentation selectedHost, String vCenterUserName, String vCenterPassword,
+            String vCenterEndpoint);
 }

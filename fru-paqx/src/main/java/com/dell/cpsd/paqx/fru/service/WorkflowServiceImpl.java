@@ -33,6 +33,8 @@ public class WorkflowServiceImpl implements WorkflowService {
         workflowSteps.put("captureRackHDEndpoint", new NextStep("captureCoprHDEndpoint"));
         workflowSteps.put("captureCoprHDEndpoint", new NextStep("capturevCenterEndpoint"));
         workflowSteps.put("capturevCenterEndpoint", new NextStep("captureScaleIOEndpoint"));
+
+        //These are the credentials for the MDM on scale io.
         workflowSteps.put("captureScaleIOEndpoint", new NextStep("startScaleIODataCollection"));
         workflowSteps.put("startScaleIODataCollection", new NextStep("startvCenterDataCollection"));
         workflowSteps.put("startvCenterDataCollection", new NextStep("presentSystemListForRemoval"));

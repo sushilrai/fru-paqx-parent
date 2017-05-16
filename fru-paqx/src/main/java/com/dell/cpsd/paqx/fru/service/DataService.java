@@ -11,6 +11,7 @@ import com.dell.cpsd.paqx.fru.rest.dto.vCenterSystemProperties;
 import com.dell.cpsd.paqx.fru.rest.representation.HostRepresentation;
 import com.dell.cpsd.storage.capabilities.api.SIONodeRemoveRequestMessage;
 import com.dell.cpsd.storage.capabilities.api.ScaleIOSystemDataRestRep;
+import com.dell.cpsd.virtualization.capabilities.api.DestroyVMRequestMessage;
 
 import java.util.List;
 import java.util.UUID;
@@ -30,4 +31,7 @@ public interface DataService {
 
     SIONodeRemoveRequestMessage getSDSHostsToRemoveFromHostRepresentation(String jobId, HostRepresentation selectedHost,
             final String scaleIOEndpoint, final String scaleIOPassword, final String scaleIOUserName);
+
+    List<DestroyVMRequestMessage> getDestroyVMRequestMessage(String jobId, HostRepresentation selectedHost, String vCenterEndpoint,
+            String vCenterPassword, String vCenterUserName);
 }

@@ -8,6 +8,7 @@ import com.dell.cpsd.paqx.fru.rest.repository.DataServiceRepository;
 import com.dell.cpsd.paqx.fru.rest.repository.H2DataServiceRepository;
 import com.dell.cpsd.paqx.fru.service.DataService;
 import com.dell.cpsd.paqx.fru.service.DataServiceImpl;
+import com.dell.cpsd.paqx.fru.transformers.DestroyVMDtoToDestroyVMRequestMessageTransformer;
 import com.dell.cpsd.paqx.fru.transformers.DiscoveryInfoToVCenterSystemPropertiesTransformer;
 import com.dell.cpsd.paqx.fru.transformers.HostListToHostRepresentationTransformer;
 import com.dell.cpsd.paqx.fru.transformers.SDSListDtoToRemoveScaleIOMessageTransformer;
@@ -36,6 +37,8 @@ public class TestConfig
     @Qualifier("testService")
     DataService dataService()
     {
-        return new DataServiceImpl(dataServiceRepository(),new ScaleIORestToScaleIODomainTransformer(), new DiscoveryInfoToVCenterSystemPropertiesTransformer(), new HostListToHostRepresentationTransformer(), new SDSListDtoToRemoveScaleIOMessageTransformer());
+        return new DataServiceImpl(dataServiceRepository(), new ScaleIORestToScaleIODomainTransformer(),
+                new DiscoveryInfoToVCenterSystemPropertiesTransformer(), new HostListToHostRepresentationTransformer(),
+                new SDSListDtoToRemoveScaleIOMessageTransformer(), new DestroyVMDtoToDestroyVMRequestMessageTransformer());
     }
 }

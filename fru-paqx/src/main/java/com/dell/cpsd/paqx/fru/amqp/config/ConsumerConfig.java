@@ -17,6 +17,7 @@ import com.dell.cpsd.paqx.fru.amqp.consumer.handler.*;
 import com.dell.cpsd.paqx.fru.amqp.model.Error;
 import com.dell.cpsd.paqx.fru.amqp.model.FruErrorMessage;
 import com.dell.cpsd.paqx.fru.amqp.model.MessageProperties;
+import com.dell.cpsd.paqx.fru.transformers.DestroyVMDtoToDestroyVMRequestMessageTransformer;
 import com.dell.cpsd.paqx.fru.transformers.DiscoveryInfoToVCenterSystemPropertiesTransformer;
 import com.dell.cpsd.paqx.fru.transformers.HostListToHostRepresentationTransformer;
 import com.dell.cpsd.paqx.fru.transformers.SDSListDtoToRemoveScaleIOMessageTransformer;
@@ -163,6 +164,12 @@ public class ConsumerConfig {
     SDSListDtoToRemoveScaleIOMessageTransformer sdsListDtoToRemoveScaleIOMessageTransformer()
     {
         return new SDSListDtoToRemoveScaleIOMessageTransformer();
+    }
+
+    @Bean
+    DestroyVMDtoToDestroyVMRequestMessageTransformer destroyVMDtoToDestroyVMRequestMessageTransformer()
+    {
+        return new DestroyVMDtoToDestroyVMRequestMessageTransformer();
     }
 
     @Bean
