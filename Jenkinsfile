@@ -38,8 +38,8 @@ pipeline {
         stage('Prepare test services') {
             steps {
                 sh "docker-compose -f ${WORKSPACE}/ci/docker/docker-compose.yml pull"
-		sh "docker-compose -f ${WORKSPACE}/ci/docker/docker-compose.yml up --force-recreate -d"
 
+                sh "docker-compose -f ${WORKSPACE}/ci/docker/docker-compose.yml up --force-recreate -d"
             }
         }
         stage('Integration Test') {
@@ -47,6 +47,23 @@ pipeline {
                 sh "docker exec fru-paqx-test-${COMPOSE_PROJECT_NAME} mvn clean verify -DskipDocker=true"
             }
         }
+	    stage('Package') {
+	        when {
+                expression {
+                    return !(env.BRANCH_NAME ==~ /master|develop|release\/.*/)
+                }
+            }
+		    steps {
+                sh "mvn package -DskipTests=true -DskipITs"
+            }
+    	}
+        stage('Artifact') {
+            steps {
+               sh "mvn install -DskipTests=true -DskipITs -P buildDockerImageOnJenkins"
+               archiveArtifacts '**/*.rpm'
+            }
+        }
+
         stage('Deploy') {
 	        when {
                 expression {
@@ -55,8 +72,7 @@ pipeline {
             }
             steps {
                 sh "mvn deploy -P buildDockerImageOnJenkins -DdockerImage.tag=api-gateway-parent-develop.${env.BUILD_NUMBER} -Ddocker.registry=docker-dev-local.art.local -DdeleteDockerImages=true -DskipTests=true -DskipITs"
-		sh "cd ${WORKSPACE}/fru-paqx-distribution; ${WORKSPACE}/fru-paqx-distribution/docker/compose/build_rpm.sh"
-		archiveArtifacts artifacts: '**/*.rpm', fingerprint: true
+		            archiveArtifacts artifacts: '**/*.rpm', fingerprint: true
             }
         }
         stage('SonarQube Analysis') {
@@ -99,6 +115,8 @@ pipeline {
             step([$class: 'WsCleanup'])   
         }
         success {
+
+
             emailext attachLog: true, 
                 body: 'Pipeline job ${JOB_NAME} success. Build URL: ${BUILD_URL}', 
                 recipientProviders: [[$class: 'CulpritsRecipientProvider']], 
