@@ -5,7 +5,6 @@
 
 package com.dell.cpsd.paqx.fru.rest;
 
-import com.dell.cpsd.paqx.fru.domain.ScaleIOSDS;
 import com.dell.cpsd.paqx.fru.dto.ConsulRegistryResult;
 import com.dell.cpsd.paqx.fru.rest.domain.Job;
 import com.dell.cpsd.paqx.fru.rest.dto.EndpointCredentials;
@@ -33,16 +32,29 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
-import javax.ws.rs.core.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Link;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.PathSegment;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * Workflow resource.
@@ -432,7 +444,10 @@ public class WorkflowResource {
         final JobRepresentation jobRepresentation = new JobRepresentation(job);
         jobRepresentation.setSelectedHostRepresentation(host);
 
-        //List<ScaleIOSDS> sdssToRemove = dataService.getSDSHostsToRemoveFromHostRepresentation(host);
+//        TODO:Example of call to data service to get a scaleioremove message based on scaleio credentials and a esxi host name.
+//        SIONodeRemoveRequestMessage removeMessage = dataService
+//                .getSDSHostsToRemoveFromHostRepresentation(jobId, host, job.getScaleIOCredentials().getEndpointUrl(),
+//                        job.getScaleIOCredentials().getPassword(), job.getScaleIOCredentials().getUsername());
 
         final NextStep nextStep = workflowService.findNextStep(job.getWorkflow(), thisStep);
         if (nextStep != null) {

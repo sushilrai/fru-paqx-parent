@@ -9,9 +9,8 @@ package com.dell.cpsd.paqx.fru.service;
 import com.dell.cpsd.paqx.fru.domain.Host;
 import com.dell.cpsd.paqx.fru.domain.ScaleIOData;
 import com.dell.cpsd.paqx.fru.dto.FRUSystemData;
-import com.dell.cpsd.paqx.fru.dto.SDSListDto;
+import com.dell.cpsd.paqx.fru.dto.ScaleIORemoveDto;
 import com.dell.cpsd.paqx.fru.rest.dto.vCenterSystemProperties;
-import com.dell.cpsd.paqx.fru.rest.dto.vcenter.discovery.DataCenterDto;
 import com.dell.cpsd.paqx.fru.rest.repository.DataServiceRepository;
 import com.dell.cpsd.paqx.fru.rest.representation.HostRepresentation;
 import com.dell.cpsd.paqx.fru.transformers.DiscoveryInfoToVCenterSystemPropertiesTransformer;
@@ -26,7 +25,6 @@ import org.springframework.stereotype.Service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 
 /**
@@ -91,9 +89,10 @@ public class DataServiceImpl implements DataService {
     }
 
     @Override
-    public List<SIONodeRemoveRequestMessage> getSDSHostsToRemoveFromHostRepresentation(String jobId, HostRepresentation selectedHost)
+    public SIONodeRemoveRequestMessage getSDSHostsToRemoveFromHostRepresentation(String jobId, HostRepresentation selectedHost,
+            final String scaleIOEndpoint, final String scaleIOPassword, final String scaleIOUserName)
     {
-        List<SDSListDto> hostList=repository.getScaleIODataForSelectedHost(jobId, selectedHost);
+       ScaleIORemoveDto hostList=repository.getScaleIORemoveDtoForSelectedHost(jobId, selectedHost, scaleIOUserName, scaleIOPassword, scaleIOEndpoint);
         return sdsListDtoToRemoveScaleIOMessageTransformer.transform(hostList);
     }
 

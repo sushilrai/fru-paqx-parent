@@ -5,17 +5,14 @@
 
 package com.dell.cpsd.paqx.fru.rest.repository;
 
-import com.dell.cpsd.paqx.fru.domain.Cluster;
 import com.dell.cpsd.paqx.fru.domain.Datacenter;
 import com.dell.cpsd.paqx.fru.domain.FruJob;
 import com.dell.cpsd.paqx.fru.domain.Host;
 import com.dell.cpsd.paqx.fru.domain.ScaleIOData;
-import com.dell.cpsd.paqx.fru.domain.ScaleIORoleIP;
-import com.dell.cpsd.paqx.fru.domain.ScaleIOSDS;
 import com.dell.cpsd.paqx.fru.domain.VCenter;
-import com.dell.cpsd.paqx.fru.dto.SDSListDto;
+import com.dell.cpsd.paqx.fru.dto.ScaleIORemoveDto;
+import com.dell.cpsd.paqx.fru.dto.ScaleIORemoveDataDto;
 import com.dell.cpsd.paqx.fru.rest.representation.HostRepresentation;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
@@ -26,6 +23,8 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -120,7 +119,7 @@ public class H2DataServiceRepository implements DataServiceRepository
             LOG.error("No result", e);
         }
 
-        if (fruJob !=null)
+        if (fruJob != null)
         {
             VCenter vCenter = fruJob.getVcenter();
 
@@ -132,7 +131,8 @@ public class H2DataServiceRepository implements DataServiceRepository
 
                 if (dataCenterList != null)
                 {
-                    hostList = dataCenterList.stream().filter(Objects::nonNull).map(x -> x.getClusterList()).filter(Objects::nonNull).flatMap(y -> y.stream()).filter(Objects::nonNull).map(z -> z.getHostList()).filter(Objects::nonNull)
+                    hostList = dataCenterList.stream().filter(Objects::nonNull).map(x -> x.getClusterList()).filter(Objects::nonNull)
+                            .flatMap(y -> y.stream()).filter(Objects::nonNull).map(z -> z.getHostList()).filter(Objects::nonNull)
                             .flatMap(a -> a.stream()).filter(Objects::nonNull).collect(Collectors.toList());
                 }
             }
@@ -140,55 +140,70 @@ public class H2DataServiceRepository implements DataServiceRepository
         return hostList;
     }
 
-    private List<Object[]> correlateSDSDataWithScaleIOData()
+    private List<Object[]> correlateSDSDataWithScaleIOData(final HostRepresentation selectedHost)
     {
-        //SDSUUID, VM_IP, VM_ID, HOST_ID
-        //SCALEIO_SDS.SDS_UUID
-        //SCALEIO_IP_LIST.SDS_IP
-        //VM_IP.IP_ADDRESS
-        //
-        //select sds.sds_uuid, sds.
-        //Do the SQL HERE
-        String query="SELECT scaleio_ip_list.sds_sds_uuid, vm_ip.ip_address, virtual_machine.vm_id, virtual_machine.host_uuid "
-                + "FROM vm_ip JOIN scaleio_ip_list ON scaleio_ip_list.sds_ip = vm_ip.ip_address JOIN vm_guest_network "
-                + "ON vm_ip.vmnetwork_uuid = vm_guest_network.uuid "
-                + "JOIN virtual_machine ON vm_guest_network.virtualmachine_uuid = virtual_machine.uuid;";
-        Query q = entityManager.createNativeQuery("SELECT a.firstname, a.lastname FROM Author a");
-        return q.getResultList();
+        String query =
+                "SELECT scaleio_ip_list.sds_sds_uuid, scaleio_sds.sds_name,vm_ip.ip_address, virtual_machine.uuid, virtual_machine.host_uuid "
+                        + "FROM vm_ip " + "JOIN scaleio_ip_list ON scaleio_ip_list.sds_ip = vm_ip.ip_address "
+                        + "JOIN scaleio_sds ON scaleio_ip_list.sds_sds_uuid = scaleio_sds.sds_uuid "
+                        + "JOIN vm_guest_network ON vm_ip.vmnetwork_uuid = vm_guest_network.uuid "
+                        + "JOIN virtual_machine ON vm_guest_network.virtualmachine_uuid = virtual_machine.uuid "
+                        + "where virtual_machine.host_uuid in (select host_uuid from host where host_name='" + selectedHost.getHostName()
+                        + "');";
 
+        Query q = entityManager.createNativeQuery(query);
+        return q.getResultList();
     }
 
-
     @Override
-    public List<SDSListDto> getScaleIODataForSelectedHost(final String jobId, final HostRepresentation selectedHost)
+    public ScaleIORemoveDto getScaleIORemoveDtoForSelectedHost(final String jobId, final HostRepresentation selectedHost, String userName,
+            String password, String endpointString)
     {
-        for (Object[] columns : correlateSDSDataWithScaleIOData())
+        ScaleIORemoveDto dto = new ScaleIORemoveDto(userName, password, getPortFromEndpoint(endpointString), 443, getIPAddressFromEndpoint(endpointString));
+        StringBuilder sdsList = new StringBuilder();
+        StringBuilder mdmList = new StringBuilder();
+        StringBuilder sdcList = new StringBuilder();
+        for (Object[] columns : correlateSDSDataWithScaleIOData(selectedHost))
         {
-            //TODO: Will casting work?
+            String sdsUuid = (String) columns[0];
+            String sdsName = (String) columns[1];
+            String vmIpAddress = (String) columns[2];
+            String vmId = (String) columns[3];
+            String hostUuid = (String) columns[4];
 
-            String sdsUuid = (String)columns[0];
-            String vmIpAddress = (String)columns[1];
-            String vmId=(String)columns[2];
-            String hostUuid=(String)columns[3];
-
-            //TODO:
-            //Create SDSListDto (that looks like SIORemoveRequesTMessage) with the following
-            //private String userName;
-            //private String password;
-            //private String servicePortNumber;
-            //private String apiPortNumber;
-            //and an object containing:
-            ////            private String scaleioInterface;
-            ////            private String scaleioVolumeName;
-            ////            private String mdmHosts;
-            ////            private String sdsHosts;
-            ////            private String sdcHosts;
-
-            //Create a list of these then return them.
-
-
+            sdsList.append(sdsName);
         }
 
-        return null;
+        ScaleIORemoveDataDto s = new ScaleIORemoveDataDto("eth0", "empty", mdmList.toString(), sdsList.toString(), sdcList.toString());
+        dto.setScaleIORemoveDataDto(s);
+        return dto;
+    }
+
+    private String getIPAddressFromEndpoint(final String endpointString)
+    {
+        String returnVal = null;
+        try
+        {
+            returnVal = new URL(endpointString).getHost();
+        }
+        catch (MalformedURLException e)
+        {
+            LOG.error("Malformed URL", e);
+        }
+        return returnVal;
+    }
+
+    private int getPortFromEndpoint(final String endpointString)
+    {
+        int returnVal = -1;
+        try
+        {
+            returnVal = new URL(endpointString).getPort();
+        }
+        catch (MalformedURLException e)
+        {
+            LOG.error("Malformed URL", e);
+        }
+        return returnVal;
     }
 }
