@@ -18,7 +18,7 @@ pipeline {
     }
     environment {
         GITHUB_TOKEN = credentials('github-02')
-        COMPOSE_PROJECT_NAME = '${BRANCH_NAME}-${BUILD_NUMBER}'
+        COMPOSE_PROJECT_NAME = "fru-paqx-parent-develop-${env.BUILD_NUMBER}"
 
     }
     options { 
@@ -39,6 +39,7 @@ pipeline {
             steps {
                 sh "docker-compose -f ${WORKSPACE}/ci/docker/docker-compose.yml pull"
                 sh "docker-compose -f ${WORKSPACE}/ci/docker/docker-compose.yml up --force-recreate -d"
+
             }
         }
         stage('Integration Test') {
@@ -91,7 +92,7 @@ pipeline {
         stage('NexB Scan') {
 	        when {
                 expression {
-                    return env.BRANCH_NAME ==~ /master|develop|release\/.*/
+                    return env.BRANCH_NAME ==~ /develop|release\/.*/
                 }
             }
             steps {
