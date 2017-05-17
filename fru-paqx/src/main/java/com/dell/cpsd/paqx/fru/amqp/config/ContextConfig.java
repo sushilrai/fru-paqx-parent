@@ -35,6 +35,7 @@ import java.util.Base64;
  */
 @Configuration
 public class ContextConfig extends ConsumerContextConfig {
+
     private static final Logger LOG = LoggerFactory.getLogger(ContextConfig.class);
     private static final String CONSUMER_NAME = "fru-paqx";
 
@@ -54,6 +55,7 @@ public class ContextConfig extends ConsumerContextConfig {
      * The responses from FRU will be https regardless of the protocol/port used by the cli.
      */ public EmbeddedServletContainerFactory servletContainer() {
         TomcatEmbeddedServletContainerFactory tomcat = new TomcatEmbeddedServletContainerFactory() {
+
             @Override
             protected void postProcessContext(Context context) {
                 SecurityConstraint securityConstraint = new SecurityConstraint();
